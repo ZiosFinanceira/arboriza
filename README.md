@@ -1,12 +1,18 @@
 # 🌳 Arboriza
 
-Protótipo (exemplo em **Recife – Boa Viagem**) de um sistema para **mapear árvores de calçada** (plantadas pela prefeitura e as não cadastradas) e **decidir irrigação e adubação** de forma inteligente, para que as mudas sobrevivam e, no futuro, ajudem a baixar a temperatura das cidades.
+Protótipo (exemplo em **Recife: Recife Antigo e Marco Zero**) de um sistema para **mapear árvores de calçada** (plantadas pela prefeitura e as não cadastradas) e **decidir irrigação e adubação** de forma inteligente, para que as mudas sobrevivam e, no futuro, ajudem a baixar a temperatura das cidades.
 
 > Visão completa, arquitetura, roadmap e modelo de negócio: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 
 ## O que o protótipo já faz
 
-- 🔐 **Tela de acesso com perfis:** gestão da prefeitura (tudo), equipe de campo (árvores, chamados e rota) e Agente do Futuro (morador). Na demonstração não há senha.
+- 🔐 **Três entradas com permissões próprias:**
+  - **Área restrita** (prefeitura): administração, coordenação, financeiro, fiscalização e auditoria, cada função com o que pode ver e alterar.
+  - **Equipe de campo:** login por equipe e matrícula, ordens de serviço com checklist obrigatório, jornada e rota inteligente.
+  - **Agente do Futuro:** cadastro do morador, sugestões de novos locais (avaliadas pela equipe de vistoria) e cuidado das mudas.
+- 📋 **Ordens de serviço** geradas a partir de chamados, da rega do dia e das sugestões, distribuídas entre as equipes.
+- 💰 **Gastos:** orçamento por categoria, despesas lançadas, distribuição por região e custo das mudas perdidas.
+- 🛡️ **Acessos:** usuários, matriz de permissões e auditoria de todas as ações.
 - 🗺️ Mapa real (OpenStreetMap) com árvores coloridas por origem: prefeitura, munícipe autorizado, não cadastrada, importada do OSM.
 - 💧 **Motor de irrigação:** estima a umidade do solo de cada árvore (espécie, idade, dias desde a última rega, chuva e temperatura reais via Open-Meteo) e diz se precisa irrigar, quantos litros ou se deve adiar porque vai chover.
 - 🌱 **Agenda de adubação** por fase da árvore.
@@ -56,8 +62,13 @@ js/engine.js       motor de decisão (irrigação/adubação), funções puras
 js/chamados.js     controle urbano: tipos, riscos, faixas de cor, prioridade  ← ajustar prazos aqui
 js/obras.js        obras / plantio compensatório (TCA)
 js/agente.js       Agente do Futuro (voluntários, hortas, mutirões, pontos)
-js/acesso.js       tela de acesso e perfis
-js/ruas.js         ruas reais de Boa Viagem (OpenStreetMap) para a arte de acesso e o mapa vetorial
+js/permissoes.js   funções, permissões e auditoria
+js/acesso.js       tela de acesso (equipe, agente e área restrita)
+js/os.js           equipes, ordens de serviço e rota inteligente
+js/sugestoes.js    sugestões de moradores e avaliação
+js/gastos.js       orçamento e despesas
+js/acessos.js      usuários, matriz de permissões e auditoria
+js/ruas.js         ruas reais do Recife Antigo e entorno (OpenStreetMap) para a arte de acesso e o mapa vetorial
 js/basemap.js      mapa vetorial (CONFIG.basemap = 'vetor')
 js/app.js          interface: mapa, lista, rota, cadastro, importação
 docs/ARQUITETURA.md visão do produto e próximos passos

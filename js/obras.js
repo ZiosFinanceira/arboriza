@@ -55,7 +55,7 @@
         <div class="garantia ${g.cls}">${g.txt}</div>
         <div class="acoes">
           <button class="btn" data-obra="ver">Ver no mapa</button>
-          <button class="btn" data-obra="notificar">Gerar notificação</button>
+          <button class="btn" data-obra="notificar" data-perm="notificar_obras">Gerar notificação</button>
         </div>
       </li>`;
     }).join('');

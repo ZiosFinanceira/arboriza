@@ -55,6 +55,7 @@
 
   mapa.on('click', (e) => {
     if (!modoMapear) return;
+    if (typeof modoMapear === 'function') { const fn = modoMapear; setModoMapear(null); return fn(e.latlng); }
     pontoNovo = e.latlng;
     if (modoMapear === 'chamado') abrirFormChamado({ coords: [e.latlng.lat, e.latlng.lng] });
     else abrirFormulario();
@@ -237,7 +238,7 @@
 
       <div class="cartao">
         <h4>Saúde (vistoria)</h4>
-        <select id="sel-saude">${Object.entries(Arbo.SAUDE).map(([k, v]) => `<option value="${k}" ${k === (a.saude || 'viva') ? 'selected' : ''}>${esc(v.nome)}</option>`).join('')}</select>
+        <select id="sel-saude" data-perm="editar_saude">${Object.entries(Arbo.SAUDE).map(([k, v]) => `<option value="${k}" ${k === (a.saude || 'viva') ? 'selected' : ''}>${esc(v.nome)}</option>`).join('')}</select>
         ${(() => { const ab = engine.abandono(a, HOJE); return ab ? `<p class="alerta-esp" style="margin-top:8px">Muda abandonada: nenhum cuidado registrado há ${ab} dias.</p>` : ''; })()}
         ${a.adotadaPor ? `<p class="ajuda" style="margin-top:6px">Adotada por <b>${esc(a.adotadaPor)}</b> (Agente do Futuro)</p>` : ''}
         ${(a.historico || []).length ? `<p class="ajuda" style="margin-top:6px">Últimos cuidados: ${a.historico.slice(-3).reverse().map((h) => `${fmtData(h.data)} · ${esc(h.tipo)} · ${esc(h.por)}`).join('<br>')}</p>` : ''}
@@ -251,11 +252,11 @@
       })()}
 
       <div class="acoes">
-        <button class="btn primario" data-acao="irrigou">Registrar rega</button>
-        <button class="btn" data-acao="chamado">Abrir chamado</button>
-        <button class="btn" data-acao="adubou">Registrar adubação</button>
-        ${a.origem === 'nao-cadastrada' || a.origem === 'osm' ? '<button class="btn" data-acao="regularizar">Incluir no cadastro oficial</button>' : ''}
-        <button class="btn perigo" data-acao="remover">Remover</button>
+        <button class="btn primario" data-acao="irrigou" data-perm="registrar_cuidado">Registrar rega</button>
+        <button class="btn" data-acao="chamado" data-perm="abrir_chamado">Abrir chamado</button>
+        <button class="btn" data-acao="adubou" data-perm="registrar_cuidado">Registrar adubação</button>
+        ${a.origem === 'nao-cadastrada' || a.origem === 'osm' ? '<button class="btn" data-acao="regularizar" data-perm="regularizar_arvore">Incluir no cadastro oficial</button>' : ''}
+        <button class="btn perigo" data-acao="remover" data-perm="excluir_arvore">Remover</button>
       </div>`;
     $('#btn-fechar').onclick = fecharDetalhe;
     d.querySelectorAll('[data-acao]').forEach((b) => (b.onclick = () => acao(a, b.dataset.acao)));
@@ -274,6 +275,7 @@
   }
 
   function registrar(a, tipo, por) {
+    Arbo.auditar(tipo === 'rega' ? 'Registrou rega' : 'Registrou adubação', `${a.id} por ${por}`);
     a.historico = a.historico || [];
     a.historico.push({ data: hojeISO(), tipo, por });
     if (tipo === 'rega') a.ultimaIrrigacao = hojeISO();
@@ -281,6 +283,7 @@
   }
 
   function mudarSaude(a, saude) {
+    Arbo.auditar('Registrou saúde da muda', `${a.id}: ${Arbo.SAUDE[saude].nome}`);
     a.saude = saude;
     salvar();
     const jaTem = chamados.some((c) => c.arvoreId === a.id && c.tipo === 'substituicao' && c.status !== 'concluido');
@@ -293,14 +296,20 @@
   }
 
   function acao(a, tipo) {
-    if (tipo === 'irrigou') registrar(a, 'rega', 'equipe');
-    if (tipo === 'adubou') registrar(a, 'adubação', 'equipe');
+    const quem = (Arbo.sessao() || {}).nome || 'equipe';
+    if (tipo === 'irrigou') registrar(a, 'rega', quem);
+    if (tipo === 'adubou') registrar(a, 'adubação', quem);
+    if (tipo === 'regularizar') Arbo.auditar('Regularizou árvore', a.id);
     if (tipo === 'regularizar') a.origem = 'autorizada';
     if (tipo === 'chamado') return abrirFormChamado({ arvoreId: a.id });
     if (tipo === 'remover') {
-      if (!confirm('Remover esta árvore do mapa?')) return;
-      arvores = arvores.filter((x) => x.id !== a.id);
-      salvar(); fecharDetalhe(); return;
+      confirmar('Remover esta árvore do mapa? A ação fica registrada na auditoria.', 'Remover').then((ok) => {
+        if (!ok) return;
+        arvores = arvores.filter((x) => x.id !== a.id);
+        Arbo.auditar('Excluiu árvore', a.id);
+        salvar(); fecharDetalhe();
+      });
+      return;
     }
     salvar();
     selecionar(a.id, false);
@@ -319,7 +328,7 @@
   function setModoMapear(modo) {
     modoMapear = modo || null;
     $('#aviso-mapear').classList.toggle('oculto', !modoMapear);
-    $('#aviso-mapear').firstChild.textContent = modoMapear === 'chamado'
+    $('#aviso-mapear').firstChild.textContent = typeof modoMapear === 'function' ? (modoMapear.msg || 'Clique no mapa') + ' · ' : modoMapear === 'chamado'
       ? 'Clique no local do problema (ou em uma árvore) · ' : 'Clique no mapa onde está a árvore · ';
     mapa.getContainer().style.cursor = modoMapear ? 'crosshair' : '';
   }
@@ -464,20 +473,21 @@
         </dl>
       </div>
       <label class="ajuda">Alterar risco
-        <select id="ch-risco">${Object.entries(CH.RISCOS).map(([k, v]) => `<option value="${k}" ${k === c.risco ? 'selected' : ''}>${v.nome}</option>`).join('')}</select>
+        <select id="ch-risco" data-perm="alterar_risco">${Object.entries(CH.RISCOS).map(([k, v]) => `<option value="${k}" ${k === c.risco ? 'selected' : ''}>${v.nome}</option>`).join('')}</select>
       </label>
       <div class="acoes">
-        ${c.status === 'aberto' ? '<button class="btn primario" data-ch-acao="atendimento">Iniciar atendimento</button>' : ''}
-        ${c.status !== 'concluido' ? '<button class="btn primario" data-ch-acao="concluir">Concluir</button>' : '<button class="btn" data-ch-acao="reabrir">Reabrir</button>'}
+        ${c.status === 'aberto' ? '<button class="btn primario" data-ch-acao="atendimento" data-perm="atender_chamado">Iniciar atendimento</button>' : ''}
+        ${c.status !== 'concluido' ? '<button class="btn primario" data-ch-acao="concluir" data-perm="atender_chamado">Concluir</button>' : '<button class="btn" data-ch-acao="reabrir" data-perm="atender_chamado">Reabrir</button>'}
       </div>`;
     $('#btn-fechar').onclick = () => { chSelecionado = null; fecharDetalhe(); };
     if (c.arvoreId) $('#btn-ver-arvore').onclick = () => { chSelecionado = null; selecionar(c.arvoreId, true); };
-    $('#ch-risco').onchange = (e) => { c.risco = e.target.value; salvarCh(); selecionarChamado(c.id, false); };
+    $('#ch-risco').onchange = (e) => { Arbo.auditar('Alterou risco', `${c.id}: ${CH.RISCOS[c.risco].nome} → ${CH.RISCOS[e.target.value].nome}`); c.risco = e.target.value; salvarCh(); selecionarChamado(c.id, false); };
     d.querySelectorAll('[data-ch-acao]').forEach((b) => (b.onclick = () => {
       const t = b.dataset.chAcao;
       if (t === 'atendimento') c.status = 'atendimento';
       if (t === 'concluir') { c.status = 'concluido'; c.conclusao = new Date().toISOString(); }
       if (t === 'reabrir') { c.status = 'aberto'; c.conclusao = null; }
+      Arbo.auditar({ atendimento: 'Iniciou atendimento', concluir: 'Concluiu chamado', reabrir: 'Reabriu chamado' }[t], c.id);
       salvarCh(); selecionarChamado(c.id, false);
     }));
     atualizar();
@@ -505,17 +515,22 @@
     setModoMapear(null);
     if ($('#dlg-chamado').returnValue !== 'ok' || !novoChamado) return;
     const f = $('#form-chamado');
-    const c = {
-      id: 'ch-' + Date.now().toString(36),
-      arvoreId: novoChamado.arvoreId || null, coords: novoChamado.coords || null,
-      tipo: f.tipo.value, risco: f.risco.value, origem: f.origem.value, descricao: f.descricao.value.trim(),
-      abertura: new Date().toISOString(), status: 'aberto', conclusao: null
-    };
-    chamados.push(c);
+    const c = criarChamado({ arvoreId: novoChamado.arvoreId || null, coords: novoChamado.coords || null,
+      tipo: f.tipo.value, risco: f.risco.value, origem: f.origem.value, descricao: f.descricao.value.trim() });
     novoChamado = null;
-    salvarCh();
-    selecionarChamado(c.id, false);
+    if (Arbo.pode('ver_chamados')) selecionarChamado(c.id, false);
+    else { toast('Chamado enviado. A prefeitura vai avaliar.'); atualizar(); }
   });
+
+  function criarChamado(dados) {
+    const c = { id: 'ch-' + Date.now().toString(36), arvoreId: null, coords: null, endereco: '', ...dados,
+      abertura: new Date().toISOString(), status: 'aberto', conclusao: null };
+    chamados.push(c);
+    salvarCh();
+    Arbo.auditar('Abriu chamado', `${c.id} · ${CH.TIPOS[c.tipo]} · ${CH.RISCOS[c.risco].nome}`);
+    Arbo.app.aoCriarChamado.forEach((fn) => fn(c));
+    return c;
+  }
 
   function preencherSelectsCh() {
     const op = (obj) => Object.entries(obj).map(([k, v]) => `<option value="${k}">${esc(v.nome || v)}</option>`).join('');
@@ -551,7 +566,7 @@
 
   // ---------- dados: OSM, exportar, importar ----------
   $('#btn-osm').onclick = async () => {
-    if (mapa.getZoom() < 16) return alert('Aproxime mais o mapa (zoom 16 ou mais) para importar.');
+    if (mapa.getZoom() < 16) return toast('Aproxime mais o mapa (zoom 16 ou mais) para importar.');
     const b = mapa.getBounds();
     const q = `[out:json][timeout:25];node["natural"="tree"](${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()});out 300;`;
     const btn = $('#btn-osm');
@@ -574,9 +589,9 @@
         n++;
       });
       salvar(); atualizar(true);
-      alert(n ? `${n} árvores importadas do OpenStreetMap.` : 'Nenhuma árvore nova encontrada nesta área do OSM.');
+      toast(n ? `${n} árvores importadas do OpenStreetMap.` : 'Nenhuma árvore nova encontrada nesta área do OSM.');
     } catch (e) {
-      alert('Não foi possível consultar o OpenStreetMap agora. Tente de novo em instantes.');
+      toast('Não foi possível consultar o OpenStreetMap agora. Tente de novo em instantes.');
     } finally {
       btn.disabled = false; btn.textContent = 'Importar árvores do OpenStreetMap (área visível)';
     }
@@ -606,19 +621,35 @@
       const ids = new Set(novas.map((n) => n.id));
       arvores = arvores.filter((a) => !ids.has(a.id)).concat(novas);
       salvar(); atualizar(true);
-      alert(`${novas.length} árvores importadas.`);
+      toast(`${novas.length} árvores importadas.`);
     } catch (err) {
-      alert('Arquivo GeoJSON inválido.');
+      toast('Arquivo GeoJSON inválido.');
     }
     e.target.value = '';
   };
 
-  $('#btn-reset').onclick = () => {
-    if (!confirm('Apagar os dados deste navegador e voltar aos exemplos?')) return;
+  $('#btn-reset').onclick = () => confirmar('Apagar os dados deste navegador e voltar aos exemplos?', 'Restaurar').then((ok) => {
+    if (!ok) return;
     arvores = Arbo.seed(); chamados = CH.seed(); salvar(); salvarCh();
     Arbo.app.aoRestaurar.forEach((f) => f());
+    Arbo.auditar('Restaurou dados de exemplo');
     fecharDetalhe(); mapa.setView(CONFIG.centro, CONFIG.zoom);
-  };
+  });
+
+  // Confirmação dentro da página (alert/confirm do navegador são bloqueados em alguns ambientes)
+  function confirmar(msg, rotulo) {
+    return new Promise((ok) => {
+      const d = $('#dlg-confirmar');
+      $('#confirmar-texto').textContent = msg;
+      $('#btn-confirmar-sim').textContent = rotulo || 'Confirmar';
+      d.onclose = () => ok(d.returnValue === 'sim');
+      d.returnValue = ''; d.showModal();
+    });
+  }
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+    clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600);
+  }
 
   // ---------- clima (Open-Meteo, gratuito e sem chave) ----------
   async function carregarClima() {
@@ -659,12 +690,14 @@
     Arbo.app.renderers.forEach((f) => f());
   }
 
-  // API interna usada pelos módulos js/obras.js e js/agente.js
+  // API interna usada pelos módulos (obras, agente, sugestões, OS, gastos, acessos, acesso)
   Arbo.app = {
     get arvores() { return arvores; }, get chamados() { return chamados; }, get hoje() { return HOJE; },
     mapa, analisar, salvar, salvarCh, selecionar, selecionarChamado, atualizar, registrar, abrirFormChamado, setModoMapear,
     esc, fmtData, hojeISO, abaAtiva: () => document.querySelector('.aba.ativa').dataset.aba,
-    renderers: [], detalhe: [], aoRestaurar: []
+    renderers: [], detalhe: [], aoRestaurar: [], aoCriarChamado: [], aoIniciar: [],
+    criarChamado, localChamado, fecharDetalhe, toast, confirmar,
+    modoClique: (msg, fn) => { fn.msg = msg; setModoMapear(fn); }
   };
 
   // ---------- início ----------

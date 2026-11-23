@@ -81,7 +81,7 @@ De onde vêm as demandas de manejo: poda, corte, remoção, recuperação, risco
 ### 3.6 Obras e plantio compensatório (TCA)
 **O problema, visto em campo:** quando um prédio é construído, a construtora faz a urbanização da calçada e planta as mudas da compensação ambiental. Entre o plantio e a entrega do condomínio, ninguém rega nem aduba, e em poucos meses a muda seca e sobra só o tronco.
 
-**Recife:** o exemplo do protótipo usa Boa Viagem. Antes de apresentar à prefeitura do Recife, levantar qual é o instrumento local equivalente (licença, termo de compensação) e o prazo de manutenção exigido.
+**Recife:** o exemplo do protótipo usa o Recife Antigo e o entorno do Marco Zero. Antes de apresentar à prefeitura do Recife, levantar qual é o instrumento local equivalente (licença, termo de compensação) e o prazo de manutenção exigido.
 
 **Referência de São Paulo:** lá isso é regulado pelo **TCA (Termo de Compromisso Ambiental)**, firmado com a Secretaria do Verde e do Meio Ambiente (SVMA). O valor da muda no cálculo da compensação já inclui **2 anos de manutenção** (Decreto 53.889/2013). Uma CPI da Câmara (2016) já apontou a necessidade de ampliar esse prazo de responsabilidade. A SVMA publica a lista de TCAs em CSV no site da prefeitura, e esses dados podem alimentar o sistema.
 
@@ -113,7 +113,34 @@ O lado público do sistema. Pode funcionar como site ou app aberto, separado do 
 - Árvores não cadastradas incorporadas ao inventário.
 - Cobertura de copa por bairro e cruzamento com **temperatura de superfície** (imagens Landsat/Sentinel), para mostrar onde plantar e o efeito ao longo dos anos.
 
-## 4. Modelo de dados (inicial)
+## 4. Perfis de acesso e permissões
+
+O sistema tem três portas de entrada, cada uma com suas obrigações e restrições. A matriz completa (permissão × função) aparece na aba **Acessos** e está definida em `js/permissoes.js`.
+
+| Entrada | Quem | O que faz | O que não faz |
+|---|---|---|---|
+| **Área restrita** (botão discreto na tela de acesso) | Servidores da prefeitura | Depende da função, ver abaixo | — |
+| **Equipe de campo** | Servidores e terceirizados, um login por pessoa (equipe + matrícula), usando o tablet da equipe | Executa as próprias ordens de serviço com checklist obrigatório, segue a rota do dia, registra rega e saúde da muda, avalia sugestões de moradores | Não vê gastos, não exclui árvores, não vê OS de outras equipes como suas |
+| **Agente do Futuro** | Moradores com cadastro (nome, e-mail, celular, bairro e aceite dos termos) | Vê o mapa das mudas, rega e adota, participa de hortas e mutirões, **sugere novos locais** e avisa problemas | Não vê chamados internos, gastos nem dados de outras pessoas |
+
+Funções da área restrita:
+- **Administração do sistema:** tudo, inclusive usuários, orçamento e restauração de dados.
+- **Coordenação de arborização:** opera o dia a dia (árvores, chamados, distribuição de OS entre equipes, sugestões, obras). Vê gastos, mas não lança.
+- **Financeiro:** lança despesas e acompanha a distribuição do orçamento. Operação só leitura.
+- **Fiscalização ambiental:** obras e compensações, notifica construtoras, abre chamados.
+- **Controle e auditoria:** vê tudo, inclusive o registro de ações, e não altera nada.
+
+**Ordens de serviço:** cada chamado vira uma OS para a equipe certa (manejo, cuidado ou vistoria); a rega do dia vira uma OS com paradas; cada sugestão de morador vira uma OS de vistoria. Fluxo: pendente → em deslocamento → em execução → concluída. A OS só pode ser concluída com o checklist completo (EPI, isolamento da área, fotos etc.), e os horários de saída, chegada e conclusão ficam registrados.
+
+**Rota inteligente:** urgentes primeiro; depois, vizinho mais próximo ponderado pela prioridade, saindo da base das equipes, com estimativa de km e de tempo (deslocamento + tempo de serviço por tipo). No protótipo a distância é em linha reta; na versão real, usar roteamento pelas ruas (ex.: OSRM ou GraphHopper).
+
+**Sugestões e combate a trote:** só envia quem tem cadastro; limite de 5 sugestões por dia; um pedido repetido a menos de 20 m do mesmo tipo vira "apoio" ao pedido existente; quem avalia vê o histórico de quem sugeriu (aprovadas e recusadas); recusas têm motivo padronizado (inclusive "possível trote") e a administração pode bloquear o cadastro. Na versão real: confirmação do celular por código ou login gov.br.
+
+**Auditoria:** entradas e saídas, cuidados registrados, decisões, mudanças de risco, redistribuição de OS, despesas e mudanças de orçamento ficam registradas com quem, quando e o quê.
+
+**Importante:** no protótipo, as restrições são aplicadas só na tela. Na versão real, o servidor precisa validar cada ação (ex.: políticas RLS no Supabase por função e por equipe).
+
+## 5. Modelo de dados (inicial)
 
 ```
 arvore(id, geom POINT, especie_id, origem, status, endereco, data_plantio,
@@ -127,13 +154,20 @@ empreendimento(id, nome, responsavel, tca_numero, data_plantio, meses_garantia, 
 agente(id, nome, pontos, bairro)          -- voluntário
 cuidado(arvore_id, agente_id NULL, tipo, data, foto_url)  -- rega/adubação/adoção
 ponto_agente(id, tipo [horta|mutirao], geom, nome, quando, descricao)
+usuario(id, nome, email, papel, equipe_id NULL, ativo)
+equipe(id, nome, funcao, veiculo, tablet)
+ordem_servico_item(os_id, arvore_id, regada_em)   -- paradas da rota de rega
+sugestao(id, agente_id, tipo, geom, descricao, foto_url, status, motivo, avaliador_id, apoios)
+despesa(id, data, categoria, descricao, regiao, valor, contrato, lancado_por)
+orcamento(ano, categoria, valor)
+auditoria(quando, usuario_id, acao, detalhe)
 chamado(id, arvore_id NULL, geom POINT, tipo, risco, origem, descricao,
         status [aberto|atendimento|concluido], aberto_em, concluido_em, equipe_id)
 ```
 
 O protótipo já guarda um subconjunto disso e exporta em **GeoJSON**, formato que qualquer SIG municipal (QGIS, ArcGIS) abre.
 
-## 5. Stack sugerida
+## 6. Stack sugerida
 
 | Camada | Agora (grátis) | Depois |
 |---|---|---|
@@ -145,7 +179,7 @@ O protótipo já guarda um subconjunto disso e exporta em **GeoJSON**, formato q
 
 Observação: o servidor público de tiles do OpenStreetMap tem política de uso justo. Para o piloto com prefeitura, usem um provedor de tiles (MapTiler, Stadia etc.) ou hospedem os próprios.
 
-## 6. Roadmap
+## 7. Roadmap
 
 **Fase 0 (agora):** protótipo navegável (este repositório). Serve para apresentar a ideia.
 
@@ -164,7 +198,7 @@ Observação: o servidor público de tiles do OpenStreetMap tem política de uso
 - Mapa de calor × cobertura de copa para planejar plantio.
 - Integração com sistemas da prefeitura (ordem de serviço, 156).
 
-## 7. Como vender para prefeitura (pontos para estudar)
+## 8. Como vender para prefeitura (pontos para estudar)
 
 - **Contratação pública:** Lei 14.133/2021 (licitações) e, para startups, o **Marco Legal das Startups (LC 182/2021)**, que criou o *Contrato Público para Solução Inovadora (CPSI)*: permite à prefeitura testar uma solução em piloto pago com processo simplificado. Vale estudar a fundo com alguém da área jurídica.
 - **Porta de entrada:** secretarias de Meio Ambiente/Verde, de Zeladoria/Subprefeituras e programas de cidades inteligentes. Editais de inovação aberta e hubs municipais também são caminhos.
@@ -172,7 +206,7 @@ Observação: o servidor público de tiles do OpenStreetMap tem política de uso
 - **Argumento central:** "cada muda que morre é dinheiro de plantio jogado fora". Mostrem o custo de replantio contra o custo do sistema.
 - **LGPD:** fotos de campo podem pegar pessoas e placas de carro. Prevejam desfoque ou regra de captura.
 
-## 8. Premissas a validar
+## 9. Premissas a validar
 
 - [ ] Limiares de umidade e litros por espécie/fase (com engenheiro agrônomo ou florestal).
 - [ ] Quanto custa hoje para a prefeitura alvo plantar e manter uma muda, e qual a taxa de perda.

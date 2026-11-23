@@ -21,8 +21,7 @@
 
   function ganhar(qtd, msg) {
     perfil.pontos += qtd; salvar();
-    const t = $('#toast'); t.textContent = `+${qtd} pontos · ${msg}`; t.classList.add('on');
-    clearTimeout(ganhar.t); ganhar.t = setTimeout(() => t.classList.remove('on'), 2200);
+    A.toast(`+${qtd} pontos · ${msg}`);
   }
 
   function tarefas() {
@@ -53,9 +52,9 @@
         <div class="sub">${esc(a.endereco || '')}</div>
         <div class="oque">${oque}</div>
         <div class="acoes">
-          ${irr.acao === 'irrigar' || aband ? '<button class="btn primario" data-ag="rega">Eu reguei</button>' : ''}
-          ${adu.acao === 'adubar' ? '<button class="btn" data-ag="composto">Coloquei composto</button>' : ''}
-          ${!a.adotadaPor ? '<button class="btn" data-ag="adotar">Adotar</button>' : ''}
+          ${irr.acao === 'irrigar' || aband ? '<button class="btn primario" data-ag="rega" data-perm="cuidar_como_agente">Eu reguei</button>' : ''}
+          ${adu.acao === 'adubar' ? '<button class="btn" data-ag="composto" data-perm="cuidar_como_agente">Coloquei composto</button>' : ''}
+          ${!a.adotadaPor ? '<button class="btn" data-ag="adotar" data-perm="cuidar_como_agente">Adotar</button>' : ''}
         </div>
       </li>`;
     }).join('') || '<p class="ajuda">Nenhuma muda precisando de ajuda agora.</p>';
@@ -67,7 +66,7 @@
         <div class="sub">${esc(p.endereco)} · ${p.data ? fmtData(p.data) + ', ' : ''}${esc(p.quando)}</div>
         <div class="oque">${esc(p.oque)}</div>
         <div class="acoes">
-          <button class="btn ${vou ? '' : 'primario'}" data-ag="evento">${vou ? 'Presença confirmada' : 'Vou participar'}</button>
+          <button class="btn ${vou ? '' : 'primario'}" data-ag="evento" data-perm="cuidar_como_agente">${vou ? 'Presença confirmada' : 'Vou participar'}</button>
           <button class="btn" data-ag="ver-pt">Ver no mapa</button>
         </div>
       </li>`;

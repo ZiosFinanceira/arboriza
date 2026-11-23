@@ -19,58 +19,105 @@
     <symbol id="i-rota" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></symbol>
     <symbol id="i-dados" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
     <symbol id="i-sair" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></symbol>
+    <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-lista" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+    <symbol id="i-moeda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2s1.3 1.7 3 2 3 .9 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/></symbol>
+    <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
   </svg>
 
   <!-- ================= ACESSO ================= -->
   <section id="acesso" class="acesso">
     <div class="acesso-arte">
-      <svg id="arte-mapa" preserveAspectRatio="xMidYMid slice"></svg>
+      <svg id="arte-mapa" preserveAspectRatio="xMaxYMid slice"></svg>
       <div class="acesso-marca">
         <div class="logo"><svg><use href="#i-arvore"/></svg> Arboriza</div>
         <h1>Cada muda cuidada hoje é sombra em Recife amanhã.</h1>
         <p>Mapa vivo das árvores de calçada: rega, adubação, chamados e o cuidado dos moradores no mesmo lugar.</p>
       </div>
-      <div class="acesso-legenda">Boa Viagem · ruas reais do OpenStreetMap</div>
+      <div class="acesso-legenda">Recife Antigo e Marco Zero · ruas reais do OpenStreetMap</div>
     </div>
 
-    <form id="form-acesso" class="acesso-card">
-      <h2>Entrar</h2>
-      <p class="ajuda">Escolha como você vai usar o Arboriza.</p>
-      <fieldset class="perfis">
-        <label class="perfil-op">
-          <input type="radio" name="perfil" value="gestor" checked>
-          <span class="perfil-ic"><svg><use href="#i-dados"/></svg></span>
-          <span><b>Gestão da prefeitura</b><small>Painel completo: árvores, chamados, obras e relatórios.</small></span>
-        </label>
-        <label class="perfil-op">
-          <input type="radio" name="perfil" value="equipe">
-          <span class="perfil-ic"><svg><use href="#i-rota"/></svg></span>
-          <span><b>Equipe de campo</b><small>Chamados, rota do dia e registro de rega e vistoria.</small></span>
-        </label>
-        <label class="perfil-op">
-          <input type="radio" name="perfil" value="agente">
-          <span class="perfil-ic"><svg><use href="#i-agente"/></svg></span>
-          <span><b>Agente do Futuro</b><small>Para moradores: ajude a cuidar das mudas do seu bairro.</small></span>
-        </label>
-      </fieldset>
-      <label class="campo">Seu nome <input name="nome" required autocomplete="name" placeholder="Como quer ser chamado"></label>
-      <label class="campo">E-mail <input name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com"></label>
-      <button class="btn primario grande">Entrar</button>
-      <p class="ajuda nota">Versão de demonstração: não há senha e nada sai do seu navegador.</p>
-    </form>
+    <div class="acesso-lado">
+      <form id="form-acesso" class="acesso-card" novalidate>
+        <div id="ac-publico" class="ac-bloco">
+          <h2>Entrar</h2>
+          <p class="ajuda">Escolha como você vai usar o Arboriza.</p>
+          <fieldset class="perfis">
+            <label class="perfil-op">
+              <input type="radio" name="perfil" value="equipe" checked>
+              <span class="perfil-ic"><svg><use href="#i-rota"/></svg></span>
+              <span><b>Equipe de campo</b><small>Servidores e terceirizados: ordens de serviço, rota do dia e vistorias.</small></span>
+            </label>
+            <label class="perfil-op">
+              <input type="radio" name="perfil" value="agente">
+              <span class="perfil-ic"><svg><use href="#i-agente"/></svg></span>
+              <span><b>Agente do Futuro</b><small>Para moradores: cuide das mudas e sugira novos locais.</small></span>
+            </label>
+          </fieldset>
+          <div id="ac-equipe" class="ac-bloco">
+            <label class="campo">Equipe <select name="equipe" id="ac-sel-equipe"></select></label>
+            <label class="campo">Integrante <select name="membro" id="ac-sel-membro"></select></label>
+            <div class="campos-2">
+              <label class="campo">Matrícula <input name="matricula" inputmode="numeric" autocomplete="username" placeholder="Ex.: 10231"></label>
+              <label class="campo">Senha <input name="senha_eq" type="password" autocomplete="current-password"></label>
+            </div>
+          </div>
+          <div id="ac-agente" class="ac-bloco oculto">
+            <div class="seg" role="tablist">
+              <button type="button" data-modo="criar" class="ativo">Criar cadastro</button>
+              <button type="button" data-modo="entrar">Já tenho cadastro</button>
+            </div>
+            <div id="ac-ag-criar" class="ac-bloco">
+              <label class="campo">Nome completo <input name="nome" autocomplete="name"></label>
+              <div class="campos-2">
+                <label class="campo">Celular <input name="celular" type="tel" autocomplete="tel" placeholder="(81) 9 9999-9999"></label>
+                <label class="campo">Bairro <select name="bairro" id="ac-sel-bairro"></select></label>
+              </div>
+            </div>
+            <div class="campos-2">
+              <label class="campo">E-mail <input name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com"></label>
+              <label class="campo">Senha <input name="senha_ag" type="password" autocomplete="new-password"></label>
+            </div>
+            <label class="check-linha" id="ac-termos"><input type="checkbox" name="termos"> Li e aceito os termos de uso. Meus dados servem só para identificar quem envia sugestões e evitar trotes (LGPD).</label>
+          </div>
+          <p class="erro" id="ac-erro" role="alert"></p>
+          <button class="btn primario grande" id="ac-entrar">Entrar</button>
+          <p class="ajuda nota">Versão de demonstração: as senhas não são conferidas e nada sai do seu navegador.</p>
+        </div>
+
+        <div id="ac-restrito" class="ac-bloco oculto">
+          <button type="button" class="voltar" id="ac-voltar">Voltar</button>
+          <h2>Área restrita</h2>
+          <p class="ajuda">Acesso de servidores da prefeitura. Cada função vê e altera só o que lhe cabe, e toda ação fica registrada.</p>
+          <label class="campo">Função <select name="papel" id="ac-sel-papel"></select></label>
+          <p class="papel-desc" id="ac-papel-desc"></p>
+          <label class="campo">E-mail institucional <input name="email_inst" type="email" autocomplete="username" placeholder="nome@prefeitura.exemplo"></label>
+          <label class="campo">Senha <input name="senha_inst" type="password" autocomplete="current-password"></label>
+          <p class="erro" id="ac-erro-r" role="alert"></p>
+          <button class="btn primario grande">Entrar na área restrita</button>
+          <p class="ajuda nota">Na versão real: login institucional com verificação em duas etapas.</p>
+        </div>
+      </form>
+      <button type="button" class="btn-restrita" id="btn-area-restrita"><svg><use href="#i-cadeado"/></svg>Área restrita</button>
+    </div>
   </section>
 
   <!-- ================= APP ================= -->
   <main class="app" id="app">
     <nav class="trilho" aria-label="Seções">
       <div class="trilho-logo" title="Arboriza"><svg><use href="#i-arvore"/></svg></div>
-      <button class="aba ativa" data-aba="arvores" data-perfis="gestor equipe"><svg><use href="#i-arvore"/></svg><span>Árvores</span></button>
-      <button class="aba" data-aba="controle" data-perfis="gestor equipe"><svg><use href="#i-alerta"/></svg><span>Chamados</span><b id="badge-vermelhos" class="badge oculto"></b></button>
-      <button class="aba" data-aba="obras" data-perfis="gestor"><svg><use href="#i-obra"/></svg><span>Obras</span></button>
-      <button class="aba" data-aba="agente" data-perfis="gestor agente"><svg><use href="#i-agente"/></svg><span>Agente</span></button>
-      <button class="aba" data-aba="rota" data-perfis="gestor equipe"><svg><use href="#i-rota"/></svg><span>Rota</span></button>
-      <button class="aba" data-aba="dados" data-perfis="gestor"><svg><use href="#i-dados"/></svg><span>Dados</span></button>
+      <button class="aba ativa" data-aba="arvores" data-perm="ver_arvores"><svg><use href="#i-arvore"/></svg><span>Árvores</span></button>
+      <button class="aba" data-aba="os" data-perm="ver_os minhas_os"><svg><use href="#i-lista"/></svg><span>Serviços</span></button>
+      <button class="aba" data-aba="controle" data-perm="ver_chamados"><svg><use href="#i-alerta"/></svg><span>Chamados</span><b id="badge-vermelhos" class="badge oculto"></b></button>
+      <button class="aba" data-aba="sugestoes" data-perm="ver_sugestoes"><svg><use href="#i-pin"/></svg><span>Sugestões</span></button>
+      <button class="aba" data-aba="obras" data-perm="ver_obras"><svg><use href="#i-obra"/></svg><span>Obras</span></button>
+      <button class="aba" data-aba="gastos" data-perm="ver_gastos"><svg><use href="#i-moeda"/></svg><span>Gastos</span></button>
+      <button class="aba" data-aba="agente" data-perm="ver_agente"><svg><use href="#i-agente"/></svg><span>Agente</span></button>
+      <button class="aba" data-aba="rota" data-perm="ver_rota"><svg><use href="#i-rota"/></svg><span>Rota</span></button>
+      <button class="aba" data-aba="acessos" data-perm="ver_acessos"><svg><use href="#i-escudo"/></svg><span>Acessos</span></button>
+      <button class="aba" data-aba="dados" data-perm="ver_dados"><svg><use href="#i-dados"/></svg><span>Dados</span></button>
       <div class="trilho-fim">
         <div class="avatar" id="avatar" title=""></div>
         <button class="sair" id="btn-sair" title="Sair"><svg><use href="#i-sair"/></svg><span>Sair</span></button>
@@ -92,7 +139,7 @@
             <option value="inadequada">Espécie inadequada</option>
           </select>
         </div>
-        <button id="btn-mapear" class="btn primario">Mapear árvore</button>
+        <button id="btn-mapear" class="btn primario" data-perm="mapear_arvore">Mapear árvore</button>
         <ul id="lista" class="lista"></ul>
       </section>
 
@@ -109,8 +156,45 @@
             <option value="concluido">Concluídos</option>
           </select>
         </div>
-        <button id="btn-chamado" class="btn primario">Abrir chamado no mapa</button>
+        <button id="btn-chamado" class="btn primario" data-perm="abrir_chamado">Abrir chamado no mapa</button>
         <ul id="lista-ch" class="lista"></ul>
+      </section>
+
+      <!-- Ordens de serviço -->
+      <section class="conteudo oculto" id="aba-os">
+        <div id="os-cabecalho" class="bloco"></div>
+        <div id="os-corpo" class="bloco"></div>
+      </section>
+
+      <!-- Sugestões -->
+      <section class="conteudo oculto" id="aba-sugestoes">
+        <header class="sec-head"><h2>Sugestões de moradores</h2><p>Locais para plantio, árvores que faltam no mapa e mudas precisando de cuidado, enviados por Agentes do Futuro cadastrados. A equipe de vistoria vai ao local e decide.</p></header>
+        <div class="kpis" id="kpis-sug"></div>
+        <ul id="lista-sug" class="lista"></ul>
+      </section>
+
+      <!-- Gastos -->
+      <section class="conteudo oculto" id="aba-gastos">
+        <header class="sec-head"><h2>Gastos</h2><p>Orçamento do ano, o que já foi executado e para onde foi o dinheiro. Valores de exemplo.</p></header>
+        <div class="kpis" id="kpis-gastos"></div>
+        <button id="btn-despesa" class="btn primario" data-perm="lancar_gastos">Lançar despesa</button>
+        <h3 class="secao">Distribuição por categoria</h3>
+        <ul id="gastos-categorias" class="barras"></ul>
+        <h3 class="secao">Por região</h3>
+        <ul id="gastos-regioes" class="barras"></ul>
+        <h3 class="secao">Últimos lançamentos</h3>
+        <table class="tabela"><thead><tr><th>Data</th><th>Despesa</th><th class="num">Valor</th></tr></thead><tbody id="gastos-lancamentos"></tbody></table>
+      </section>
+
+      <!-- Acessos -->
+      <section class="conteudo oculto" id="aba-acessos">
+        <header class="sec-head"><h2>Acessos</h2><p>Quem pode fazer o quê, quem está ativo e o registro de todas as ações.</p></header>
+        <h3 class="secao">Usuários</h3>
+        <table class="tabela"><thead><tr><th>Usuário</th><th>Função</th><th>Situação</th></tr></thead><tbody id="acessos-usuarios"></tbody></table>
+        <h3 class="secao">Permissões por função</h3>
+        <div class="rolagem"><table class="tabela matriz" id="acessos-matriz"></table></div>
+        <h3 class="secao">Auditoria</h3>
+        <table class="tabela"><thead><tr><th>Quando</th><th>Quem</th><th>Ação</th></tr></thead><tbody id="acessos-auditoria"></tbody></table>
       </section>
 
       <!-- Obras -->
@@ -127,11 +211,13 @@
           <p>Veja onde você pode ajudar perto de você. Cada rega registrada tira uma muda da fila da prefeitura.</p>
           <div id="agente-perfil"></div>
         </div>
+        <h3 class="secao">Suas sugestões</h3>
+        <div id="agente-sugestoes" class="bloco"></div>
         <h3 class="secao">Mudas precisando de você</h3>
         <ul id="agente-tarefas" class="lista"></ul>
         <h3 class="secao">Hortas e mutirões</h3>
         <ul id="agente-pontos" class="lista"></ul>
-        <button id="btn-agente-problema" class="btn">Avisar um problema: galho, árvore caindo, raiz</button>
+        <button id="btn-agente-problema" class="btn" data-perm="abrir_chamado">Avisar um problema: galho, árvore caindo, raiz</button>
         <details class="regras">
           <summary>O que o agente pode e não pode fazer</summary>
           <p><b>Pode:</b> regar mudas novas, cobrir o solo com folhas secas ou composto, limpar o canteiro e avisar a prefeitura.</p>
@@ -151,20 +237,21 @@
       <!-- Dados -->
       <section class="conteudo oculto" id="aba-dados">
         <header class="sec-head"><h2>Dados</h2><p>Importar e exportar o inventário. Nesta versão os dados ficam só neste navegador.</p></header>
-        <button id="btn-osm" class="btn">Importar árvores do OpenStreetMap (área visível)</button>
+        <button id="btn-osm" class="btn" data-perm="importar_dados">Importar árvores do OpenStreetMap (área visível)</button>
         <p class="ajuda">Busca pontos <code>natural=tree</code> mapeados pela comunidade. Aproxime o mapa antes.</p>
         <button id="btn-exportar" class="btn">Exportar árvores (GeoJSON)</button>
         <button id="btn-csv-ch" class="btn">Exportar chamados (planilha CSV)</button>
-        <label class="btn">Importar GeoJSON <input type="file" id="inp-importar" accept=".json,.geojson" hidden></label>
-        <button id="btn-reset" class="btn perigo">Restaurar dados de exemplo</button>
+        <label class="btn" data-perm="importar_dados">Importar GeoJSON <input type="file" id="inp-importar" accept=".json,.geojson" hidden></label>
+        <button id="btn-reset" class="btn perigo" data-perm="restaurar_dados">Restaurar dados de exemplo</button>
       </section>
     </aside>
 
     <div class="mapa-wrap">
       <div id="mapa"></div>
+      <div class="chip-perfil" id="chip-perfil"></div>
       <div class="chip-clima" id="clima">Carregando clima…</div>
       <div id="aviso-mapear" class="aviso oculto">Clique no mapa onde está a árvore · <button id="btn-cancelar-mapear">Cancelar</button></div>
-      <details class="legenda" open><summary>Legenda</summary><div id="legenda"></div></details>
+      <details class="legenda"><summary>Legenda</summary><div id="legenda"></div></details>
       <aside id="detalhe" class="detalhe oculto"></aside>
     </div>
   </main>
@@ -209,17 +296,58 @@
       <button type="button" id="btn-copiar-notif" class="btn primario">Copiar texto</button>
     </div>
   </dialog>
+  <dialog id="dlg-sugestao">
+    <form id="form-sugestao" method="dialog">
+      <h3>Sugerir um local</h3>
+      <p class="aviso-sug" id="sug-aviso"></p>
+      <label>O que é <select name="tipo" id="sel-sug-tipo"></select></label>
+      <label>Endereço ou ponto de referência <input name="endereco" placeholder="Ex.: em frente ao nº 120"></label>
+      <label>Descreva <textarea name="descricao" rows="3" required placeholder="O que você viu e por que sugere este local"></textarea></label>
+      <label>Foto (ajuda a equipe a avaliar) <input name="foto" type="file" accept="image/*" capture="environment"></label>
+      <label class="check"><input type="checkbox" name="veracidade" required> Confirmo que a informação é verdadeira. Trotes podem bloquear meu cadastro.</label>
+      <div class="acoes">
+        <button type="button" id="btn-cancelar-sug" class="btn">Cancelar</button>
+        <button value="ok" class="btn primario">Enviar sugestão</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-despesa">
+    <form id="form-despesa" method="dialog">
+      <h3>Lançar despesa</h3>
+      <div class="campos-2"><label>Data <input type="date" name="data" required></label><label>Valor (R$) <input type="number" name="valor" min="0.01" step="0.01" required></label></div>
+      <label>Categoria <select name="cat" id="sel-desp-cat"></select></label>
+      <label>Descrição <input name="desc" required placeholder="Ex.: abastecimento do caminhão-pipa"></label>
+      <div class="campos-2"><label>Região <select name="regiao" id="sel-desp-reg"></select></label><label>Contrato ou referência <input name="ref" placeholder="Ex.: Contrato 012/2026"></label></div>
+      <div class="acoes">
+        <button type="button" id="btn-cancelar-desp" class="btn">Cancelar</button>
+        <button value="ok" class="btn primario">Lançar despesa</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-confirmar">
+    <form method="dialog">
+      <p id="confirmar-texto" style="margin:0 0 16px;font-size:15px"></p>
+      <div class="acoes"><button value="nao" class="btn">Cancelar</button><button value="sim" class="btn primario" id="btn-confirmar-sim">Confirmar</button></div>
+    </form>
+  </dialog>
   <div id="toast" class="toast" role="status"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/ruas.js"></script>
   <script src="js/basemap.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/permissoes.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/chamados.js"></script>
   <script src="js/app.js"></script>
   <script src="js/obras.js"></script>
   <script src="js/agente.js"></script>
+  <script src="js/sugestoes.js"></script>
+  <script src="js/os.js"></script>
+  <script src="js/gastos.js"></script>
+  <script src="js/acessos.js"></script>
   <script src="js/acesso.js"></script>
 </body>
 </html>
