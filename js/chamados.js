@@ -23,7 +23,7 @@ window.Arbo = window.Arbo || {};
     'urgente': { nome: 'Urgente',     peso: 4, sigla: 'U' }
   };
 
-  // Faixas de cor pelo TEMPO EM ABERTO (dias). O cronômetro não tem fim: passou de 10 dias, fica vermelho para sempre.
+  // Faixas de cor pelo TEMPO EM ABERTO (dias), para Baixo risco, Risco e Risco alto. O cronômetro não tem fim: passou de 10 dias, fica vermelho para sempre.
   const FAIXAS = [
     { ate: 3,        cor: '#1e88e5', nome: 'Azul',     desc: 'até 3 dias' },
     { ate: 7,        cor: '#fbc02d', nome: 'Amarelo',  desc: '3 a 7 dias' },
@@ -39,7 +39,9 @@ window.Arbo = window.Arbo || {};
     return Math.max(0, (fim - new Date(ch.abertura)) / 86400000);
   }
 
+  // Urgente já nasce vermelho. Os demais riscos seguem as faixas de tempo.
   function faixa(ch, agora) {
+    if (ch.risco === 'urgente') return FAIXAS[FAIXAS.length - 1];
     const d = diasAberto(ch, agora);
     return FAIXAS.find((f) => d < f.ate);
   }

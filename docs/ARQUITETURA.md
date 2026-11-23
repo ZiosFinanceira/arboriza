@@ -73,10 +73,10 @@ De onde vêm as demandas de manejo: poda, corte, remoção, recuperação, risco
 
 - **Entrada:** central 156, vistoria da equipe, munícipe (app/site), Defesa Civil e, no futuro, alertas automáticos (ex.: sensor de inclinação, vento forte previsto).
 - **Risco (gravidade):** Baixo risco · Risco · Risco alto · Urgente.
-- **Tempo em aberto (cor):** cronômetro sem limite. 🔵 < 3 dias · 🟡 3–7 · 🟠 7–10 · 🔴 ≥ 10 (pisca e fica sempre em destaque).
+- **Cor:** **Urgente já abre vermelho.** Os demais seguem o tempo em aberto (cronômetro sem limite): 🔵 < 3 dias · 🟡 3–7 · 🟠 7–10 · 🔴 ≥ 10. Vermelho pisca e fica sempre em destaque.
 - **Fila das equipes:** urgentes → vermelhos → `peso do risco × (1 + dias/7)`. Assim nenhum chamado fica esquecido, porque todo chamado sobe na fila com o tempo.
 - **Indicadores:** tempo médio de atendimento por tipo/risco/região, nº de vermelhos, chamados por equipe. É o que o gestor apresenta para a Câmara/TCE.
-- **Próximos passos:** atribuir chamado a equipe, foto de antes/depois, SLA diferente por risco (ex.: urgente vira vermelho em horas, não em dias), integração com o sistema 156 da prefeitura e com a Defesa Civil em dias de temporal.
+- **Próximos passos:** atribuir chamado a equipe, foto de antes/depois, integração com o sistema 156 da prefeitura e com a Defesa Civil em dias de temporal.
 
 ### 3.6 Indicadores para a prefeitura (o que justifica a compra)
 - Taxa de sobrevivência de mudas (antes e depois).

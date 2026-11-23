@@ -88,7 +88,7 @@
       Object.values(ORIGENS).map((o) => `<div><i style="background:${o.cor}"></i>${o.nome}</div>`).join('') +
       '<div><i class="anel"></i>Precisa irrigar</div>' +
       '<b>Chamados (tempo aberto)</b>' +
-      CH.FAIXAS.map((f) => `<div><i class="sq" style="background:${f.cor}"></i>${f.nome}: ${f.desc}</div>`).join('');
+      CH.FAIXAS.map((f) => `<div><i class="sq" style="background:${f.cor}"></i>${f.nome}: ${f.desc}${f === CH.FAIXAS[3] ? ' ou Urgente' : ''}</div>`).join('');
   }
 
   // ---------- painel ----------
@@ -364,7 +364,7 @@
     const media = ativos.length ? ativos.reduce((s, c) => s + CH.diasAberto(c, agora), 0) / ativos.length : 0;
     $('#kpis-ch').innerHTML = `
       <div class="kpi"><b>${ativos.length}</b><span>abertos</span></div>
-      <div class="kpi vermelho"><b>${vermelhos}</b><span>+10 dias</span></div>
+      <div class="kpi vermelho"><b>${vermelhos}</b><span>vermelhos</span></div>
       <div class="kpi vermelho"><b>${urgentes}</b><span>urgentes</span></div>
       <div class="kpi"><b>${media.toFixed(1)}d</b><span>tempo médio</span></div>`;
     const badge = $('#badge-vermelhos');

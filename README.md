@@ -13,7 +13,7 @@ Protótipo de um sistema para **mapear árvores de calçada** (plantadas pela pr
 - ⚠️ Alerta de **espécie inadequada para calçada** (ex.: fícus).
 - ➕ Mapear árvore nova clicando no mapa; registrar irrigação e adubação; regularizar árvore não cadastrada.
 - 🚨 **Controle urbano:** chamados de poda, corte, remoção, recuperação, risco de queda, raiz na calçada, fiação e pragas.
-  - Cada chamado vira um alerta no mapa com **cronômetro sem fim**. A cor muda pelo tempo em aberto: 🔵 até 3 dias → 🟡 3 a 7 → 🟠 7 a 10 → 🔴 10+ dias. Os vermelhos piscam e ficam sempre em destaque.
+  - Cada chamado vira um alerta no mapa com **cronômetro sem fim**. A cor muda pelo tempo em aberto: 🔵 até 3 dias → 🟡 3 a 7 → 🟠 7 a 10 → 🔴 10+ dias. Chamado **Urgente já nasce vermelho**. Os vermelhos piscam e ficam sempre em destaque.
   - 4 níveis de risco (**Baixo risco, Risco, Risco alto, Urgente**) que definem a fila: urgentes primeiro, depois vermelhos, depois risco × tempo.
   - Fluxo aberto → em atendimento → concluído, contador de vermelhos na aba e exportação em CSV (abre no Excel).
 - 📥 Importar árvores do **OpenStreetMap** da área visível; exportar e importar **GeoJSON**.
