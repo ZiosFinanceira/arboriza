@@ -43,7 +43,7 @@ window.Arbo = window.Arbo || {};
     const ult = parse(arv.ultimaIrrigacao);
     const dias = ult ? clamp(diasEntre(ult, hoje), 0, 60) : 30;
     const tmax = clima && clima.tmax != null ? clima.tmax : 27;
-    const perdaDia = 2.5 + Math.max(0, tmax - 25) * 0.35;
+    const perdaDia = 1.6 + Math.max(0, tmax - 26) * 0.25;
     const chuva = clima && clima.chuvaPassada3d != null ? clima.chuvaPassada3d : 0;
     const v = 45 - dias * perdaDia + Math.min(chuva * 1.5, 30) + ruido(arv.id + hoje.toDateString()) * 6;
     return Math.round(clamp(v, 5, 55));

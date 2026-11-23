@@ -49,26 +49,25 @@
       const oque = irr.acao === 'irrigar' ? `Regar ${irr.litros} L (≈ ${baldes} balde${baldes > 1 ? 's' : ''}), de manhã cedo ou fim de tarde`
         : aband ? 'Verificar se a terra está seca e regar' : 'Espalhar composto orgânico ao redor (kit)';
       return `<li class="tarefa" data-arv="${a.id}">
-        <div class="nome">${esc(esp.nome)} ${aband ? '<span class="tag irrigar">abandonada</span>' : ''} ${a.adotadaPor ? '<span class="tag ok">adotada</span>' : ''}</div>
+        <div class="nome" data-ag="ver" title="Ver no mapa">${esc(esp.nome)} ${aband ? '<span class="tag irrigar">abandonada</span>' : ''} ${a.adotadaPor ? '<span class="tag ok">adotada</span>' : ''}</div>
         <div class="sub">${esc(a.endereco || '')}</div>
         <div class="oque">${oque}</div>
         <div class="acoes">
-          ${irr.acao === 'irrigar' || aband ? '<button class="btn primario" data-ag="rega">💧 Eu reguei</button>' : ''}
-          ${adu.acao === 'adubar' ? '<button class="btn" data-ag="composto">🌱 Coloquei composto</button>' : ''}
-          ${!a.adotadaPor ? '<button class="btn" data-ag="adotar">💚 Adotar</button>' : ''}
-          <button class="btn" data-ag="ver">Ver</button>
+          ${irr.acao === 'irrigar' || aband ? '<button class="btn primario" data-ag="rega">Eu reguei</button>' : ''}
+          ${adu.acao === 'adubar' ? '<button class="btn" data-ag="composto">Coloquei composto</button>' : ''}
+          ${!a.adotadaPor ? '<button class="btn" data-ag="adotar">Adotar</button>' : ''}
         </div>
       </li>`;
-    }).join('') || '<p class="ajuda">Nenhuma muda precisando de ajuda agora. 🎉</p>';
+    }).join('') || '<p class="ajuda">Nenhuma muda precisando de ajuda agora.</p>';
 
     $('#agente-pontos').innerHTML = pontos.map((p) => {
       const vou = perfil.eventos.includes(p.id);
       return `<li class="tarefa" data-pt="${p.id}">
-        <div class="nome">${p.tipo === 'horta' ? '🥬' : '🤝'} ${esc(p.nome)}</div>
+        <div class="nome">${esc(p.nome)}</div>
         <div class="sub">${esc(p.endereco)} · ${p.data ? fmtData(p.data) + ', ' : ''}${esc(p.quando)}</div>
         <div class="oque">${esc(p.oque)}</div>
         <div class="acoes">
-          <button class="btn ${vou ? '' : 'primario'}" data-ag="evento">${vou ? '✓ Confirmado' : 'Vou participar'}</button>
+          <button class="btn ${vou ? '' : 'primario'}" data-ag="evento">${vou ? 'Presença confirmada' : 'Vou participar'}</button>
           <button class="btn" data-ag="ver-pt">Ver no mapa</button>
         </div>
       </li>`;
@@ -112,6 +111,7 @@
     A.setModoMapear('chamado');
   };
 
+  A.nomeAgente = (n) => { perfil.nome = n; salvar(); };
   A.renderers.push(render);
   A.aoRestaurar.push(() => { perfil = { nome: '', pontos: 0, eventos: [] }; salvar(); });
 })();

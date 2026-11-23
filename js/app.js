@@ -48,7 +48,8 @@
 
   // ---------- mapa ----------
   const mapa = L.map('mapa', { zoomControl: true }).setView(CONFIG.centro, CONFIG.zoom);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  if (CONFIG.basemap === 'vetor' && window.__RUAS) Arbo.basemapVetor(mapa, window.__RUAS);
+  else L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19, attribution: '&copy; colaboradores do OpenStreetMap'
   }).addTo(mapa);
 
@@ -158,7 +159,7 @@
     const pend = arvores.map((a) => ({ a, ...analisar(a) })).filter((x) => x.irr.acao === 'irrigar');
     if (camadaRota) { camadaRota.remove(); camadaRota = null; }
     if (!pend.length) {
-      $('#rota-resumo').textContent = 'Nenhuma árvore precisa de água hoje. 🎉';
+      $('#rota-resumo').textContent = 'Nenhuma árvore precisa de água hoje.';
       $('#rota-lista').innerHTML = '';
       return;
     }
@@ -199,7 +200,7 @@
       <button class="fechar" id="btn-fechar" title="Fechar">×</button>
       <h2>${esc(esp.nome)}</h2>
       <div class="cient">${esc(esp.cientifico)} · ${esc(a.id)}</div>
-      ${!esp.calcada ? `<div class="alerta-esp">⚠️ Espécie inadequada para calçada. ${esc(esp.obs || '')}</div>` : ''}
+      ${!esp.calcada ? `<div class="alerta-esp">Espécie inadequada para calçada. ${esc(esp.obs || '')}</div>` : ''}
 
       <div class="cartao">
         <h4>Irrigação</h4>
@@ -237,8 +238,8 @@
       <div class="cartao">
         <h4>Saúde (vistoria)</h4>
         <select id="sel-saude">${Object.entries(Arbo.SAUDE).map(([k, v]) => `<option value="${k}" ${k === (a.saude || 'viva') ? 'selected' : ''}>${esc(v.nome)}</option>`).join('')}</select>
-        ${(() => { const ab = engine.abandono(a, HOJE); return ab ? `<p class="alerta-esp" style="margin-top:8px">🚩 Muda abandonada: nenhum cuidado registrado há ${ab} dias.</p>` : ''; })()}
-        ${a.adotadaPor ? `<p class="ajuda" style="margin-top:6px">💚 Adotada por <b>${esc(a.adotadaPor)}</b> (Agente do Futuro)</p>` : ''}
+        ${(() => { const ab = engine.abandono(a, HOJE); return ab ? `<p class="alerta-esp" style="margin-top:8px">Muda abandonada: nenhum cuidado registrado há ${ab} dias.</p>` : ''; })()}
+        ${a.adotadaPor ? `<p class="ajuda" style="margin-top:6px">Adotada por <b>${esc(a.adotadaPor)}</b> (Agente do Futuro)</p>` : ''}
         ${(a.historico || []).length ? `<p class="ajuda" style="margin-top:6px">Últimos cuidados: ${a.historico.slice(-3).reverse().map((h) => `${fmtData(h.data)} · ${esc(h.tipo)} · ${esc(h.por)}`).join('<br>')}</p>` : ''}
       </div>
 
@@ -250,9 +251,9 @@
       })()}
 
       <div class="acoes">
-        <button class="btn primario" data-acao="irrigou">✓ Irrigada hoje</button>
-        <button class="btn" data-acao="chamado">⚠️ Abrir chamado</button>
-        <button class="btn" data-acao="adubou">✓ Adubada hoje</button>
+        <button class="btn primario" data-acao="irrigou">Registrar rega</button>
+        <button class="btn" data-acao="chamado">Abrir chamado</button>
+        <button class="btn" data-acao="adubou">Registrar adubação</button>
         ${a.origem === 'nao-cadastrada' || a.origem === 'osm' ? '<button class="btn" data-acao="regularizar">Incluir no cadastro oficial</button>' : ''}
         <button class="btn perigo" data-acao="remover">Remover</button>
       </div>`;
@@ -467,7 +468,7 @@
       </label>
       <div class="acoes">
         ${c.status === 'aberto' ? '<button class="btn primario" data-ch-acao="atendimento">Iniciar atendimento</button>' : ''}
-        ${c.status !== 'concluido' ? '<button class="btn primario" data-ch-acao="concluir">✓ Concluir</button>' : '<button class="btn" data-ch-acao="reabrir">Reabrir</button>'}
+        ${c.status !== 'concluido' ? '<button class="btn primario" data-ch-acao="concluir">Concluir</button>' : '<button class="btn" data-ch-acao="reabrir">Reabrir</button>'}
       </div>`;
     $('#btn-fechar').onclick = () => { chSelecionado = null; fecharDetalhe(); };
     if (c.arvoreId) $('#btn-ver-arvore').onclick = () => { chSelecionado = null; selecionar(c.arvoreId, true); };

@@ -3,110 +3,170 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arboriza — Gestão inteligente de árvores de calçada</title>
+  <title>Arboriza · Recife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="topo">
-    <div class="marca">🌳 <strong>Arboriza</strong> <span id="cidade" class="cidade"></span></div>
-    <div id="clima" class="clima">Carregando clima…</div>
-  </header>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-arvore" viewBox="0 0 24 24"><path d="M12 22v-7M8 15h8a5 5 0 0 0 1.2-9.85A5.5 5.5 0 0 0 6.8 5.15 5 5 0 0 0 8 15z"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17.5v.01"/></symbol>
+    <symbol id="i-obra" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6M12 5V2"/></symbol>
+    <symbol id="i-agente" viewBox="0 0 24 24"><path d="M12 21s-7-4.3-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.7-7 10-7 10z"/></symbol>
+    <symbol id="i-rota" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></symbol>
+    <symbol id="i-dados" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></symbol>
+    <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+  </svg>
 
-  <main class="layout">
+  <!-- ================= ACESSO ================= -->
+  <section id="acesso" class="acesso">
+    <div class="acesso-arte">
+      <svg id="arte-mapa" preserveAspectRatio="xMidYMid slice"></svg>
+      <div class="acesso-marca">
+        <div class="logo"><svg><use href="#i-arvore"/></svg> Arboriza</div>
+        <h1>Cada muda cuidada hoje é sombra em Recife amanhã.</h1>
+        <p>Mapa vivo das árvores de calçada: rega, adubação, chamados e o cuidado dos moradores no mesmo lugar.</p>
+      </div>
+      <div class="acesso-legenda">Boa Viagem · ruas reais do OpenStreetMap</div>
+    </div>
+
+    <form id="form-acesso" class="acesso-card">
+      <h2>Entrar</h2>
+      <p class="ajuda">Escolha como você vai usar o Arboriza.</p>
+      <fieldset class="perfis">
+        <label class="perfil-op">
+          <input type="radio" name="perfil" value="gestor" checked>
+          <span class="perfil-ic"><svg><use href="#i-dados"/></svg></span>
+          <span><b>Gestão da prefeitura</b><small>Painel completo: árvores, chamados, obras e relatórios.</small></span>
+        </label>
+        <label class="perfil-op">
+          <input type="radio" name="perfil" value="equipe">
+          <span class="perfil-ic"><svg><use href="#i-rota"/></svg></span>
+          <span><b>Equipe de campo</b><small>Chamados, rota do dia e registro de rega e vistoria.</small></span>
+        </label>
+        <label class="perfil-op">
+          <input type="radio" name="perfil" value="agente">
+          <span class="perfil-ic"><svg><use href="#i-agente"/></svg></span>
+          <span><b>Agente do Futuro</b><small>Para moradores: ajude a cuidar das mudas do seu bairro.</small></span>
+        </label>
+      </fieldset>
+      <label class="campo">Seu nome <input name="nome" required autocomplete="name" placeholder="Como quer ser chamado"></label>
+      <label class="campo">E-mail <input name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com"></label>
+      <button class="btn primario grande">Entrar</button>
+      <p class="ajuda nota">Versão de demonstração: não há senha e nada sai do seu navegador.</p>
+    </form>
+  </section>
+
+  <!-- ================= APP ================= -->
+  <main class="app" id="app">
+    <nav class="trilho" aria-label="Seções">
+      <div class="trilho-logo" title="Arboriza"><svg><use href="#i-arvore"/></svg></div>
+      <button class="aba ativa" data-aba="arvores" data-perfis="gestor equipe"><svg><use href="#i-arvore"/></svg><span>Árvores</span></button>
+      <button class="aba" data-aba="controle" data-perfis="gestor equipe"><svg><use href="#i-alerta"/></svg><span>Chamados</span><b id="badge-vermelhos" class="badge oculto"></b></button>
+      <button class="aba" data-aba="obras" data-perfis="gestor"><svg><use href="#i-obra"/></svg><span>Obras</span></button>
+      <button class="aba" data-aba="agente" data-perfis="gestor agente"><svg><use href="#i-agente"/></svg><span>Agente</span></button>
+      <button class="aba" data-aba="rota" data-perfis="gestor equipe"><svg><use href="#i-rota"/></svg><span>Rota</span></button>
+      <button class="aba" data-aba="dados" data-perfis="gestor"><svg><use href="#i-dados"/></svg><span>Dados</span></button>
+      <div class="trilho-fim">
+        <div class="avatar" id="avatar" title=""></div>
+        <button class="sair" id="btn-sair" title="Sair"><svg><use href="#i-sair"/></svg><span>Sair</span></button>
+      </div>
+    </nav>
+
     <aside class="painel">
-      <section class="kpis" id="kpis"></section>
-
-      <nav class="abas">
-        <button class="aba ativa" data-aba="arvores">Árvores</button>
-        <button class="aba" data-aba="controle">Controle urbano <span id="badge-vermelhos" class="badge oculto"></span></button>
-        <button class="aba" data-aba="obras">Obras (TCA)</button>
-        <button class="aba" data-aba="agente">Agente do Futuro</button>
-        <button class="aba" data-aba="rota">Rota do dia</button>
-        <button class="aba" data-aba="dados">Dados</button>
-      </nav>
-
+      <!-- Árvores -->
       <section class="conteudo" id="aba-arvores">
+        <header class="sec-head"><h2>Árvores</h2><p id="cidade"></p></header>
+        <div class="kpis" id="kpis"></div>
         <div class="filtros">
-          <select id="filtro-origem"><option value="">Todas as origens</option></select>
-          <select id="filtro-acao">
+          <select id="filtro-origem" aria-label="Origem"><option value="">Todas as origens</option></select>
+          <select id="filtro-acao" aria-label="Situação">
             <option value="">Todas as situações</option>
             <option value="irrigar">Precisa irrigar</option>
-            <option value="adiar">Adiar (chuva)</option>
+            <option value="adiar">Adiar por chuva</option>
             <option value="adubar">Precisa adubar</option>
             <option value="inadequada">Espécie inadequada</option>
           </select>
         </div>
-        <button id="btn-mapear" class="btn primario">+ Mapear árvore no mapa</button>
+        <button id="btn-mapear" class="btn primario">Mapear árvore</button>
         <ul id="lista" class="lista"></ul>
       </section>
 
+      <!-- Controle urbano -->
       <section class="conteudo oculto" id="aba-controle">
-        <div class="kpis kpis-ch" id="kpis-ch"></div>
+        <header class="sec-head"><h2>Controle urbano</h2><p>Poda, corte, risco de queda e outros chamados. Urgentes primeiro, depois os que estão abertos há mais tempo.</p></header>
+        <div class="kpis" id="kpis-ch"></div>
         <div class="filtros">
-          <select id="filtro-risco"><option value="">Todos os riscos</option></select>
-          <select id="filtro-status">
-            <option value="ativos">Abertos + em atendimento</option>
+          <select id="filtro-risco" aria-label="Risco"><option value="">Todos os riscos</option></select>
+          <select id="filtro-status" aria-label="Status">
+            <option value="ativos">Abertos e em atendimento</option>
             <option value="aberto">Só abertos</option>
             <option value="atendimento">Só em atendimento</option>
             <option value="concluido">Concluídos</option>
           </select>
         </div>
-        <button id="btn-chamado" class="btn primario">+ Abrir chamado no mapa</button>
-        <p class="ajuda">Fila de atendimento: urgentes primeiro, depois os demais vermelhos (+10 dias), depois risco × tempo aberto. Os vermelhos piscam no mapa.</p>
+        <button id="btn-chamado" class="btn primario">Abrir chamado no mapa</button>
         <ul id="lista-ch" class="lista"></ul>
       </section>
 
+      <!-- Obras -->
       <section class="conteudo oculto" id="aba-obras">
-        <p class="ajuda">Mudas do <b>plantio compensatório</b> de obras (Termo de Compromisso Ambiental). Acompanha quem é responsável pela manutenção, até quando, e quantas mudas sobreviveram.</p>
-        <div class="kpis kpis-ch" id="kpis-obras"></div>
+        <header class="sec-head"><h2>Obras</h2><p>Mudas plantadas como compensação ambiental de obras: quem é responsável pela manutenção, até quando, e quantas sobreviveram.</p></header>
+        <div class="kpis" id="kpis-obras"></div>
         <ul id="lista-obras" class="lista"></ul>
       </section>
 
+      <!-- Agente do Futuro -->
       <section class="conteudo oculto" id="aba-agente">
         <div class="agente-topo">
-          <h3>🌳 Seja um Agente do Futuro</h3>
-          <p>Cada muda que sobrevive hoje é sombra e uma rua mais fresca amanhã. Veja onde você pode ajudar perto de você.</p>
+          <h2>Agente do Futuro</h2>
+          <p>Veja onde você pode ajudar perto de você. Cada rega registrada tira uma muda da fila da prefeitura.</p>
           <div id="agente-perfil"></div>
         </div>
-        <h4 class="secao">Mudas precisando de você</h4>
+        <h3 class="secao">Mudas precisando de você</h3>
         <ul id="agente-tarefas" class="lista"></ul>
-        <h4 class="secao">Hortas e mutirões</h4>
+        <h3 class="secao">Hortas e mutirões</h3>
         <ul id="agente-pontos" class="lista"></ul>
-        <button id="btn-agente-problema" class="btn">⚠️ Vi um problema (árvore caindo, galho, raiz…)</button>
+        <button id="btn-agente-problema" class="btn">Avisar um problema: galho, árvore caindo, raiz</button>
         <details class="regras">
           <summary>O que o agente pode e não pode fazer</summary>
-          <p>✅ Regar mudas novas, colocar folhas secas ou composto orgânico ao redor, recolher lixo do canteiro, avisar a prefeitura sobre problemas.</p>
-          <p>🚫 Podar, cortar, arrancar ou plantar árvore na calçada sem autorização, mexer perto da fiação ou usar adubo químico por conta própria. Para isso, abra um chamado.</p>
+          <p><b>Pode:</b> regar mudas novas, cobrir o solo com folhas secas ou composto, limpar o canteiro e avisar a prefeitura.</p>
+          <p><b>Não pode:</b> podar, cortar, arrancar ou plantar na calçada sem autorização, mexer perto da fiação ou usar adubo químico por conta própria. Para isso, abra um chamado.</p>
         </details>
-        <h4 class="secao">Ranking de bairros <span class="ajuda">(exemplo)</span></h4>
+        <h3 class="secao">Ranking de bairros <span class="ajuda">(exemplo)</span></h3>
         <ul id="agente-ranking" class="ranking"></ul>
       </section>
 
+      <!-- Rota -->
       <section class="conteudo oculto" id="aba-rota">
-        <p class="ajuda">Árvores que precisam de água hoje, em ordem de visita (vizinho mais próximo). Pensado para a equipe do caminhão-pipa ou para acionar válvulas.</p>
+        <header class="sec-head"><h2>Rota do dia</h2><p>Mudas que precisam de água hoje, na ordem de visita. Para a equipe do caminhão-pipa.</p></header>
         <div id="rota-resumo" class="rota-resumo"></div>
         <ol id="rota-lista" class="lista"></ol>
       </section>
 
+      <!-- Dados -->
       <section class="conteudo oculto" id="aba-dados">
+        <header class="sec-head"><h2>Dados</h2><p>Importar e exportar o inventário. Nesta versão os dados ficam só neste navegador.</p></header>
         <button id="btn-osm" class="btn">Importar árvores do OpenStreetMap (área visível)</button>
-        <p class="ajuda">Busca pontos <code>natural=tree</code> mapeados pela comunidade. Aproxime o mapa (zoom 16+) antes.</p>
-        <button id="btn-exportar" class="btn">Exportar GeoJSON</button>
+        <p class="ajuda">Busca pontos <code>natural=tree</code> mapeados pela comunidade. Aproxime o mapa antes.</p>
+        <button id="btn-exportar" class="btn">Exportar árvores (GeoJSON)</button>
+        <button id="btn-csv-ch" class="btn">Exportar chamados (planilha CSV)</button>
         <label class="btn">Importar GeoJSON <input type="file" id="inp-importar" accept=".json,.geojson" hidden></label>
-        <button id="btn-csv-ch" class="btn">Exportar chamados (CSV / Excel)</button>
         <button id="btn-reset" class="btn perigo">Restaurar dados de exemplo</button>
-        <p class="ajuda">Protótipo: os dados ficam salvos só neste navegador. Na versão real eles vão para um banco geoespacial (ver <code>docs/ARQUITETURA.md</code>).</p>
       </section>
     </aside>
 
     <div class="mapa-wrap">
       <div id="mapa"></div>
-      <div id="aviso-mapear" class="aviso oculto">Clique no mapa onde está a árvore · <button id="btn-cancelar-mapear">cancelar</button></div>
-      <div class="legenda" id="legenda"></div>
+      <div class="chip-clima" id="clima">Carregando clima…</div>
+      <div id="aviso-mapear" class="aviso oculto">Clique no mapa onde está a árvore · <button id="btn-cancelar-mapear">Cancelar</button></div>
+      <details class="legenda" open><summary>Legenda</summary><div id="legenda"></div></details>
+      <aside id="detalhe" class="detalhe oculto"></aside>
     </div>
-
-    <aside id="detalhe" class="detalhe oculto"></aside>
   </main>
 
   <dialog id="dlg-arvore">
@@ -114,13 +174,13 @@
       <h3>Nova árvore</h3>
       <label>Espécie <select name="especie" id="sel-especie"></select></label>
       <label>Origem <select name="origem" id="sel-origem"></select></label>
-      <label>Endereço / referência <input name="endereco" placeholder="Ex.: R. Augusta, 1200"></label>
-      <label>Data de plantio (aprox.) <input type="date" name="plantio" required></label>
+      <label>Endereço ou referência <input name="endereco" placeholder="Ex.: R. Padre Carapuceiro, 800"></label>
+      <label>Data de plantio (aproximada) <input type="date" name="plantio" required></label>
       <label class="check"><input type="checkbox" name="sensor"> Tem sensor de umidade instalado</label>
       <label>Observações <textarea name="obs" rows="2"></textarea></label>
       <div class="acoes">
         <button type="button" id="btn-cancelar-form" class="btn">Cancelar</button>
-        <button value="ok" class="btn primario">Salvar</button>
+        <button value="ok" class="btn primario">Salvar árvore</button>
       </div>
     </form>
   </dialog>
@@ -143,20 +203,23 @@
   <dialog id="dlg-notificacao">
     <h3>Notificação ao responsável</h3>
     <p class="ajuda">Texto pronto para enviar por e-mail ou anexar ao processo. Revise antes de enviar.</p>
-    <textarea id="txt-notificacao" rows="16" style="font-size:13px"></textarea>
+    <textarea id="txt-notificacao" rows="16"></textarea>
     <div class="acoes">
       <button type="button" id="btn-fechar-notif" class="btn">Fechar</button>
       <button type="button" id="btn-copiar-notif" class="btn primario">Copiar texto</button>
     </div>
   </dialog>
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast" role="status"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/ruas.js"></script>
+  <script src="js/basemap.js"></script>
   <script src="js/data.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/chamados.js"></script>
   <script src="js/app.js"></script>
   <script src="js/obras.js"></script>
   <script src="js/agente.js"></script>
+  <script src="js/acesso.js"></script>
 </body>
 </html>

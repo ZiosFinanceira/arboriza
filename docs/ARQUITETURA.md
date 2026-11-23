@@ -81,7 +81,9 @@ De onde vêm as demandas de manejo: poda, corte, remoção, recuperação, risco
 ### 3.6 Obras e plantio compensatório (TCA)
 **O problema, visto em campo:** quando um prédio é construído, a construtora faz a urbanização da calçada e planta as mudas da compensação ambiental. Entre o plantio e a entrega do condomínio, ninguém rega nem aduba, e em poucos meses a muda seca e sobra só o tronco.
 
-Em São Paulo, isso é regulado pelo **TCA (Termo de Compromisso Ambiental)**, firmado com a Secretaria do Verde e do Meio Ambiente (SVMA). O valor da muda no cálculo da compensação já inclui **2 anos de manutenção** (Decreto 53.889/2013). Uma CPI da Câmara (2016) já apontou a necessidade de ampliar esse prazo de responsabilidade. A SVMA publica a lista de TCAs em CSV no site da prefeitura, e esses dados podem alimentar o sistema.
+**Recife:** o exemplo do protótipo usa Boa Viagem. Antes de apresentar à prefeitura do Recife, levantar qual é o instrumento local equivalente (licença, termo de compensação) e o prazo de manutenção exigido.
+
+**Referência de São Paulo:** lá isso é regulado pelo **TCA (Termo de Compromisso Ambiental)**, firmado com a Secretaria do Verde e do Meio Ambiente (SVMA). O valor da muda no cálculo da compensação já inclui **2 anos de manutenção** (Decreto 53.889/2013). Uma CPI da Câmara (2016) já apontou a necessidade de ampliar esse prazo de responsabilidade. A SVMA publica a lista de TCAs em CSV no site da prefeitura, e esses dados podem alimentar o sistema.
 
 O que o sistema faz:
 - Cada muda de compensação fica ligada ao **empreendimento, ao responsável e ao número do TCA**.

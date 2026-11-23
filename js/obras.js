@@ -40,7 +40,7 @@
     const vencidas = todas.filter((x) => x.r.diasGarantia < 0).length;
     $('#kpis-obras').innerHTML = `
       <div class="kpi"><b>${emps.length}</b><span>obras</span></div>
-      <div class="kpi"><b>${total}</b><span>mudas TCA</span></div>
+      <div class="kpi"><b>${total}</b><span>mudas de obra</span></div>
       <div class="kpi vermelho"><b>${mortas}</b><span>mortas</span></div>
       <div class="kpi ${vencidas ? 'vermelho' : ''}"><b>${vencidas}</b><span>garantia vencida</span></div>`;
     $('#lista-obras').innerHTML = todas.map(({ e, r }) => {
@@ -99,7 +99,7 @@ Atenciosamente,
     $('#btn-copiar-notif').focus();
   }
   $('#btn-copiar-notif').onclick = async () => {
-    try { await navigator.clipboard.writeText($('#txt-notificacao').value); $('#btn-copiar-notif').textContent = 'Copiado ✓'; }
+    try { await navigator.clipboard.writeText($('#txt-notificacao').value); $('#btn-copiar-notif').textContent = 'Texto copiado'; }
     catch (e) { $('#txt-notificacao').select(); }
     setTimeout(() => ($('#btn-copiar-notif').textContent = 'Copiar texto'), 1500);
   };

@@ -33,7 +33,7 @@ window.Arbo = window.Arbo || {};
   ];
 
   const STATUS = { 'aberto': 'Aberto', 'atendimento': 'Em atendimento', 'concluido': 'Concluído' };
-  const ORIGENS_CHAMADO = { '156': 'Central 156', 'vistoria': 'Vistoria da equipe', 'municipe': 'Munícipe (app/site)', 'defesa-civil': 'Defesa Civil', 'sensor': 'Alerta automático' };
+  const ORIGENS_CHAMADO = { '156': 'Central de atendimento', 'vistoria': 'Vistoria da equipe', 'municipe': 'Munícipe (app/site)', 'defesa-civil': 'Defesa Civil', 'sensor': 'Alerta automático' };
 
   function diasAberto(ch, agora) {
     const fim = ch.status === 'concluido' && ch.conclusao ? new Date(ch.conclusao) : agora;
@@ -68,12 +68,12 @@ window.Arbo = window.Arbo || {};
     const L = [
       ['arv-0004', null, 'poda', 'medio', 'Galhos baixos atrapalhando a passagem de ônibus.', '156', 12, 3],
       ['arv-0007', null, 'raiz-calcada', 'alto', 'Fícus levantou a calçada; pedestre tropeçou.', 'municipe', 8, 5],
-      [null, [-23.556939, -46.658869, 'R. Luís Coelho'], 'risco-queda', 'urgente', 'Árvore inclinada após temporal, sobre ponto de ônibus.', 'defesa-civil', 0, 6],
+      [null, [-8.116481, -34.894259, 'R. Antônio Falcão'], 'risco-queda', 'urgente', 'Árvore inclinada após temporal, sobre ponto de ônibus.', 'defesa-civil', 0, 6],
       ['arv-0013', null, 'fiacao', 'medio', 'Copa encostando na rede elétrica.', 'vistoria', 4, 2],
-      [null, [-23.556628, -46.657721, 'R. Antônio Carlos'], 'remocao', 'alto', 'Árvore morta em pé, tronco oco.', '156', 1, 20],
+      [null, [-8.117203, -34.894683, 'R. Mamanguape'], 'remocao', 'alto', 'Árvore morta em pé, tronco oco.', '156', 1, 20],
       ['arv-0012', null, 'praga', 'baixo', 'Cupim na base do tronco.', 'vistoria', 2, 1],
-      [null, [-23.559505, -46.656344, 'R. São Carlos do Pinhal'], 'recuperacao', 'baixo', 'Muda com tutor quebrado e protetor danificado.', 'municipe', 15, 0],
-      [null, [-23.56197, -46.655873, 'Al. Casa Branca'], 'corte', 'alto', 'Tronco rachado na bifurcação.', '156', 6, 12]
+      [null, [-8.121031, -34.902734, 'R. Bruno Veloso'], 'recuperacao', 'baixo', 'Muda com tutor quebrado e protetor danificado.', 'municipe', 15, 0],
+      [null, [-8.117414, -34.898899, 'R. Faustino Porto'], 'corte', 'alto', 'Tronco rachado na bifurcação.', '156', 6, 12]
     ];
     return L.map((r, i) => ({
       id: 'ch-' + String(i + 1).padStart(4, '0'),
