@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arboriza — Gestão inteligente de árvores de calçada</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="marca">🌳 <strong>Arboriza</strong> <span id="cidade" class="cidade"></span></div>
+    <div id="clima" class="clima">Carregando clima…</div>
+  </header>
+
+  <main class="layout">
+    <aside class="painel">
+      <section class="kpis" id="kpis"></section>
+
+      <nav class="abas">
+        <button class="aba ativa" data-aba="arvores">Árvores</button>
+        <button class="aba" data-aba="controle">Controle urbano <span id="badge-vermelhos" class="badge oculto"></span></button>
+        <button class="aba" data-aba="rota">Rota do dia</button>
+        <button class="aba" data-aba="dados">Dados</button>
+      </nav>
+
+      <section class="conteudo" id="aba-arvores">
+        <div class="filtros">
+          <select id="filtro-origem"><option value="">Todas as origens</option></select>
+          <select id="filtro-acao">
+            <option value="">Todas as situações</option>
+            <option value="irrigar">Precisa irrigar</option>
+            <option value="adiar">Adiar (chuva)</option>
+            <option value="adubar">Precisa adubar</option>
+            <option value="inadequada">Espécie inadequada</option>
+          </select>
+        </div>
+        <button id="btn-mapear" class="btn primario">+ Mapear árvore no mapa</button>
+        <ul id="lista" class="lista"></ul>
+      </section>
+
+      <section class="conteudo oculto" id="aba-controle">
+        <div class="kpis kpis-ch" id="kpis-ch"></div>
+        <div class="filtros">
+          <select id="filtro-risco"><option value="">Todos os riscos</option></select>
+          <select id="filtro-status">
+            <option value="ativos">Abertos + em atendimento</option>
+            <option value="aberto">Só abertos</option>
+            <option value="atendimento">Só em atendimento</option>
+            <option value="concluido">Concluídos</option>
+          </select>
+        </div>
+        <button id="btn-chamado" class="btn primario">+ Abrir chamado no mapa</button>
+        <p class="ajuda">Fila de atendimento: urgentes primeiro, depois os vermelhos (+10 dias), depois risco × tempo aberto. Os vermelhos piscam no mapa.</p>
+        <ul id="lista-ch" class="lista"></ul>
+      </section>
+
+      <section class="conteudo oculto" id="aba-rota">
+        <p class="ajuda">Árvores que precisam de água hoje, em ordem de visita (vizinho mais próximo). Pensado para a equipe do caminhão-pipa ou para acionar válvulas.</p>
+        <div id="rota-resumo" class="rota-resumo"></div>
+        <ol id="rota-lista" class="lista"></ol>
+      </section>
+
+      <section class="conteudo oculto" id="aba-dados">
+        <button id="btn-osm" class="btn">Importar árvores do OpenStreetMap (área visível)</button>
+        <p class="ajuda">Busca pontos <code>natural=tree</code> mapeados pela comunidade. Aproxime o mapa (zoom 16+) antes.</p>
+        <button id="btn-exportar" class="btn">Exportar GeoJSON</button>
+        <label class="btn">Importar GeoJSON <input type="file" id="inp-importar" accept=".json,.geojson" hidden></label>
+        <button id="btn-csv-ch" class="btn">Exportar chamados (CSV / Excel)</button>
+        <button id="btn-reset" class="btn perigo">Restaurar dados de exemplo</button>
+        <p class="ajuda">Protótipo: os dados ficam salvos só neste navegador. Na versão real eles vão para um banco geoespacial (ver <code>docs/ARQUITETURA.md</code>).</p>
+      </section>
+    </aside>
+
+    <div class="mapa-wrap">
+      <div id="mapa"></div>
+      <div id="aviso-mapear" class="aviso oculto">Clique no mapa onde está a árvore · <button id="btn-cancelar-mapear">cancelar</button></div>
+      <div class="legenda" id="legenda"></div>
+    </div>
+
+    <aside id="detalhe" class="detalhe oculto"></aside>
+  </main>
+
+  <dialog id="dlg-arvore">
+    <form id="form-arvore" method="dialog">
+      <h3>Nova árvore</h3>
+      <label>Espécie <select name="especie" id="sel-especie"></select></label>
+      <label>Origem <select name="origem" id="sel-origem"></select></label>
+      <label>Endereço / referência <input name="endereco" placeholder="Ex.: R. Augusta, 1200"></label>
+      <label>Data de plantio (aprox.) <input type="date" name="plantio" required></label>
+      <label class="check"><input type="checkbox" name="sensor"> Tem sensor de umidade instalado</label>
+      <label>Observações <textarea name="obs" rows="2"></textarea></label>
+      <div class="acoes">
+        <button type="button" id="btn-cancelar-form" class="btn">Cancelar</button>
+        <button value="ok" class="btn primario">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-chamado">
+    <form id="form-chamado" method="dialog">
+      <h3>Abrir chamado</h3>
+      <p id="ch-local" class="ajuda"></p>
+      <label>Tipo <select name="tipo" id="sel-tipo"></select></label>
+      <label>Risco <select name="risco" id="sel-risco"></select></label>
+      <label>Origem do chamado <select name="origem" id="sel-origem-ch"></select></label>
+      <label>Descrição <textarea name="descricao" rows="3" required placeholder="O que está acontecendo?"></textarea></label>
+      <div class="acoes">
+        <button type="button" id="btn-cancelar-ch" class="btn">Cancelar</button>
+        <button value="ok" class="btn primario">Abrir chamado</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/chamados.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
