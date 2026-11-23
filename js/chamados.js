@@ -12,6 +12,7 @@ window.Arbo = window.Arbo || {};
     'raiz-calcada': 'Raiz danificando calçada',
     'fiacao':       'Conflito com fiação',
     'praga':        'Praga / doença',
+    'substituicao': 'Muda morta — substituir',
     'outro':        'Outro'
   };
 

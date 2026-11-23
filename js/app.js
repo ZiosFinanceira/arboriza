@@ -70,7 +70,8 @@
         radius: a.id === selecionada ? 11 : 8,
         color: alerta ? '#c62828' : !esp.calcada ? '#ef6c00' : '#fff',
         weight: alerta || !esp.calcada ? 3 : 2,
-        fillColor: cor, fillOpacity: 0.9
+        fillColor: a.saude === 'morta' ? '#6d4c41' : cor, fillOpacity: a.saude === 'morta' ? 0.55 : 0.9,
+        dashArray: a.saude === 'morta' ? '3 3' : null
       }).addTo(mapa);
       m.bindTooltip(`${esp.nome} · ${irr.umidade}% umidade`);
       m.on('click', (ev) => {
@@ -87,6 +88,7 @@
       '<b>Árvores</b>' +
       Object.values(ORIGENS).map((o) => `<div><i style="background:${o.cor}"></i>${o.nome}</div>`).join('') +
       '<div><i class="anel"></i>Precisa irrigar</div>' +
+      '<div><i style="background:#6d4c41;opacity:.6"></i>Muda morta</div>' +
       '<b>Chamados (tempo aberto)</b>' +
       CH.FAIXAS.map((f) => `<div><i class="sq" style="background:${f.cor}"></i>${f.nome}: ${f.desc}${f === CH.FAIXAS[3] ? ' ou Urgente' : ''}</div>`).join('');
   }
@@ -232,6 +234,16 @@
         ${a.origem === 'nao-cadastrada' ? '<p class="ajuda">Árvore plantada sem registro. Próximo passo: vistoria e regularização (incluir no inventário oficial ou planejar substituição).</p>' : ''}
       </div>
 
+      <div class="cartao">
+        <h4>Saúde (vistoria)</h4>
+        <select id="sel-saude">${Object.entries(Arbo.SAUDE).map(([k, v]) => `<option value="${k}" ${k === (a.saude || 'viva') ? 'selected' : ''}>${esc(v.nome)}</option>`).join('')}</select>
+        ${(() => { const ab = engine.abandono(a, HOJE); return ab ? `<p class="alerta-esp" style="margin-top:8px">🚩 Muda abandonada: nenhum cuidado registrado há ${ab} dias.</p>` : ''; })()}
+        ${a.adotadaPor ? `<p class="ajuda" style="margin-top:6px">💚 Adotada por <b>${esc(a.adotadaPor)}</b> (Agente do Futuro)</p>` : ''}
+        ${(a.historico || []).length ? `<p class="ajuda" style="margin-top:6px">Últimos cuidados: ${a.historico.slice(-3).reverse().map((h) => `${fmtData(h.data)} · ${esc(h.tipo)} · ${esc(h.por)}`).join('<br>')}</p>` : ''}
+      </div>
+
+      ${Arbo.app.detalhe.map((x) => x.html(a)).join('')}
+
       ${(() => {
         const abertos = chamados.filter((c) => c.arvoreId === a.id && c.status !== 'concluido');
         return abertos.length ? `<div class="cartao"><h4>Chamados abertos</h4><ul class="lista">${abertos.map(itemChamado).join('')}</ul></div>` : '';
@@ -247,6 +259,8 @@
     $('#btn-fechar').onclick = fecharDetalhe;
     d.querySelectorAll('[data-acao]').forEach((b) => (b.onclick = () => acao(a, b.dataset.acao)));
     d.querySelectorAll('.item.ch').forEach((li) => (li.onclick = () => selecionarChamado(li.dataset.ch, true)));
+    $('#sel-saude').onchange = (e) => mudarSaude(a, e.target.value);
+    Arbo.app.detalhe.forEach((x) => x.bind && x.bind(a, d));
     atualizar(false);
     setTimeout(() => mapa.invalidateSize(), 0);
   }
@@ -258,9 +272,28 @@
     setTimeout(() => mapa.invalidateSize(), 0);
   }
 
+  function registrar(a, tipo, por) {
+    a.historico = a.historico || [];
+    a.historico.push({ data: hojeISO(), tipo, por });
+    if (tipo === 'rega') a.ultimaIrrigacao = hojeISO();
+    if (tipo === 'adubação') a.ultimaAdubacao = hojeISO();
+  }
+
+  function mudarSaude(a, saude) {
+    a.saude = saude;
+    salvar();
+    const jaTem = chamados.some((c) => c.arvoreId === a.id && c.tipo === 'substituicao' && c.status !== 'concluido');
+    if (saude === 'morta' && !jaTem) {
+      const emp = a.empreendimento && Arbo.app.empreendimento ? Arbo.app.empreendimento(a.empreendimento) : null;
+      return abrirFormChamado({ arvoreId: a.id, tipo: 'substituicao', risco: 'medio', origem: 'vistoria',
+        descricao: 'Muda morta/seca constatada em vistoria. Substituir.' + (emp ? ` Plantio compensatório de ${emp.nome} — verificar responsabilidade de ${emp.responsavel}.` : '') });
+    }
+    selecionar(a.id, false);
+  }
+
   function acao(a, tipo) {
-    if (tipo === 'irrigou') a.ultimaIrrigacao = hojeISO();
-    if (tipo === 'adubou') a.ultimaAdubacao = hojeISO();
+    if (tipo === 'irrigou') registrar(a, 'rega', 'equipe');
+    if (tipo === 'adubou') registrar(a, 'adubação', 'equipe');
     if (tipo === 'regularizar') a.origem = 'autorizada';
     if (tipo === 'chamado') return abrirFormChamado({ arvoreId: a.id });
     if (tipo === 'remover') {
@@ -452,6 +485,8 @@
 
   let novoChamado = null;
   function abrirFormChamado(alvo) {
+    alvo = { ...(Arbo.app.presetChamado || {}), ...alvo };
+    Arbo.app.presetChamado = null;
     novoChamado = alvo;
     const f = $('#form-chamado');
     f.reset();
@@ -461,6 +496,7 @@
       txt = `Árvore: ${(ESPECIES[a.especie] || ESPECIES.desconhecida).nome} · ${a.endereco || a.id}`;
     }
     $('#ch-local').textContent = txt;
+    ['tipo', 'risco', 'origem', 'descricao'].forEach((k) => { if (alvo[k]) f[k].value = alvo[k]; });
     $('#dlg-chamado').showModal();
   }
   $('#btn-cancelar-ch').onclick = () => $('#dlg-chamado').close('cancel');
@@ -578,7 +614,9 @@
 
   $('#btn-reset').onclick = () => {
     if (!confirm('Apagar os dados deste navegador e voltar aos exemplos?')) return;
-    arvores = Arbo.seed(); chamados = CH.seed(); salvar(); salvarCh(); fecharDetalhe(); mapa.setView(CONFIG.centro, CONFIG.zoom);
+    arvores = Arbo.seed(); chamados = CH.seed(); salvar(); salvarCh();
+    Arbo.app.aoRestaurar.forEach((f) => f());
+    fecharDetalhe(); mapa.setView(CONFIG.centro, CONFIG.zoom);
   };
 
   // ---------- clima (Open-Meteo, gratuito e sem chave) ----------
@@ -605,9 +643,10 @@
   // ---------- abas ----------
   document.querySelectorAll('.aba').forEach((b) => (b.onclick = () => {
     document.querySelectorAll('.aba').forEach((x) => x.classList.toggle('ativa', x === b));
-    ['arvores', 'controle', 'rota', 'dados'].forEach((n) => $('#aba-' + n).classList.toggle('oculto', n !== b.dataset.aba));
+    document.querySelectorAll('.aba').forEach((x) => $('#aba-' + x.dataset.aba).classList.toggle('oculto', x !== b));
     if (b.dataset.aba !== 'rota' && camadaRota) { camadaRota.remove(); camadaRota = null; }
     if (b.dataset.aba === 'rota') rota();
+    atualizar();
   }));
   $('#filtro-origem').onchange = $('#filtro-acao').onchange = () => atualizar(true);
   $('#filtro-risco').onchange = $('#filtro-status').onchange = () => atualizar(true);
@@ -616,7 +655,16 @@
     kpis(); lista(); desenharMarcadores();
     controle();
     if (!$('#aba-rota').classList.contains('oculto')) rota();
+    Arbo.app.renderers.forEach((f) => f());
   }
+
+  // API interna usada pelos módulos js/obras.js e js/agente.js
+  Arbo.app = {
+    get arvores() { return arvores; }, get chamados() { return chamados; }, get hoje() { return HOJE; },
+    mapa, analisar, salvar, salvarCh, selecionar, selecionarChamado, atualizar, registrar, abrirFormChamado, setModoMapear,
+    esc, fmtData, hojeISO, abaAtiva: () => document.querySelector('.aba.ativa').dataset.aba,
+    renderers: [], detalhe: [], aoRestaurar: []
+  };
 
   // ---------- início ----------
   $('#cidade').textContent = CONFIG.cidade;

@@ -16,6 +16,9 @@ Protótipo de um sistema para **mapear árvores de calçada** (plantadas pela pr
   - Cada chamado vira um alerta no mapa com **cronômetro sem fim**. A cor muda pelo tempo em aberto: 🔵 até 3 dias → 🟡 3 a 7 → 🟠 7 a 10 → 🔴 10+ dias. Chamado **Urgente já nasce vermelho**. Os vermelhos piscam e ficam sempre em destaque.
   - 4 níveis de risco (**Baixo risco, Risco, Risco alto, Urgente**) que definem a fila: urgentes primeiro, depois vermelhos, depois risco × tempo.
   - Fluxo aberto → em atendimento → concluído, contador de vermelhos na aba e exportação em CSV (abre no Excel).
+- 🏗️ **Obras (TCA):** acompanha as mudas do plantio compensatório de cada empreendimento: responsável, prazo de manutenção, taxa de sobrevivência, mudas mortas ou abandonadas e notificação pronta para a construtora.
+- 💚 **Agente do Futuro:** o lado do cidadão. Mostra as mudas que precisam de rega ou de adoção, as hortas comunitárias e os mutirões. Cada cuidado registrado entra no histórico da árvore e vale pontos.
+- 🩺 **Saúde da muda:** viva, estressada, morta ou substituída. Ao marcar como morta, o sistema já abre um chamado de substituição.
 - 📥 Importar árvores do **OpenStreetMap** da área visível; exportar e importar **GeoJSON**.
 
 Os dados ficam só no navegador (localStorage). Os sensores são **simulados**.
@@ -50,6 +53,8 @@ css/style.css      visual
 js/data.js         cidade, catálogo de espécies, árvores de exemplo  ← trocar a cidade aqui
 js/engine.js       motor de decisão (irrigação/adubação), funções puras
 js/chamados.js     controle urbano: tipos, riscos, faixas de cor, prioridade  ← ajustar prazos aqui
+js/obras.js        obras / plantio compensatório (TCA)
+js/agente.js       Agente do Futuro (voluntários, hortas, mutirões, pontos)
 js/app.js          interface: mapa, lista, rota, cadastro, importação
 docs/ARQUITETURA.md visão do produto e próximos passos
 ```

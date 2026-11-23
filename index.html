@@ -20,6 +20,8 @@
       <nav class="abas">
         <button class="aba ativa" data-aba="arvores">Árvores</button>
         <button class="aba" data-aba="controle">Controle urbano <span id="badge-vermelhos" class="badge oculto"></span></button>
+        <button class="aba" data-aba="obras">Obras (TCA)</button>
+        <button class="aba" data-aba="agente">Agente do Futuro</button>
         <button class="aba" data-aba="rota">Rota do dia</button>
         <button class="aba" data-aba="dados">Dados</button>
       </nav>
@@ -53,6 +55,32 @@
         <button id="btn-chamado" class="btn primario">+ Abrir chamado no mapa</button>
         <p class="ajuda">Fila de atendimento: urgentes primeiro, depois os demais vermelhos (+10 dias), depois risco × tempo aberto. Os vermelhos piscam no mapa.</p>
         <ul id="lista-ch" class="lista"></ul>
+      </section>
+
+      <section class="conteudo oculto" id="aba-obras">
+        <p class="ajuda">Mudas do <b>plantio compensatório</b> de obras (Termo de Compromisso Ambiental). Acompanha quem é responsável pela manutenção, até quando, e quantas mudas sobreviveram.</p>
+        <div class="kpis kpis-ch" id="kpis-obras"></div>
+        <ul id="lista-obras" class="lista"></ul>
+      </section>
+
+      <section class="conteudo oculto" id="aba-agente">
+        <div class="agente-topo">
+          <h3>🌳 Seja um Agente do Futuro</h3>
+          <p>Cada muda que sobrevive hoje é sombra e uma rua mais fresca amanhã. Veja onde você pode ajudar perto de você.</p>
+          <div id="agente-perfil"></div>
+        </div>
+        <h4 class="secao">Mudas precisando de você</h4>
+        <ul id="agente-tarefas" class="lista"></ul>
+        <h4 class="secao">Hortas e mutirões</h4>
+        <ul id="agente-pontos" class="lista"></ul>
+        <button id="btn-agente-problema" class="btn">⚠️ Vi um problema (árvore caindo, galho, raiz…)</button>
+        <details class="regras">
+          <summary>O que o agente pode e não pode fazer</summary>
+          <p>✅ Regar mudas novas, colocar folhas secas ou composto orgânico ao redor, recolher lixo do canteiro, avisar a prefeitura sobre problemas.</p>
+          <p>🚫 Podar, cortar, arrancar ou plantar árvore na calçada sem autorização, mexer perto da fiação ou usar adubo químico por conta própria. Para isso, abra um chamado.</p>
+        </details>
+        <h4 class="secao">Ranking de bairros <span class="ajuda">(exemplo)</span></h4>
+        <ul id="agente-ranking" class="ranking"></ul>
       </section>
 
       <section class="conteudo oculto" id="aba-rota">
@@ -112,10 +140,23 @@
     </form>
   </dialog>
 
+  <dialog id="dlg-notificacao">
+    <h3>Notificação ao responsável</h3>
+    <p class="ajuda">Texto pronto para enviar por e-mail ou anexar ao processo. Revise antes de enviar.</p>
+    <textarea id="txt-notificacao" rows="16" style="font-size:13px"></textarea>
+    <div class="acoes">
+      <button type="button" id="btn-fechar-notif" class="btn">Fechar</button>
+      <button type="button" id="btn-copiar-notif" class="btn primario">Copiar texto</button>
+    </div>
+  </dialog>
+  <div id="toast" class="toast"></div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/data.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/chamados.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/obras.js"></script>
+  <script src="js/agente.js"></script>
 </body>
 </html>

@@ -78,7 +78,34 @@ De onde vêm as demandas de manejo: poda, corte, remoção, recuperação, risco
 - **Indicadores:** tempo médio de atendimento por tipo/risco/região, nº de vermelhos, chamados por equipe. É o que o gestor apresenta para a Câmara/TCE.
 - **Próximos passos:** atribuir chamado a equipe, foto de antes/depois, integração com o sistema 156 da prefeitura e com a Defesa Civil em dias de temporal.
 
-### 3.6 Indicadores para a prefeitura (o que justifica a compra)
+### 3.6 Obras e plantio compensatório (TCA)
+**O problema, visto em campo:** quando um prédio é construído, a construtora faz a urbanização da calçada e planta as mudas da compensação ambiental. Entre o plantio e a entrega do condomínio, ninguém rega nem aduba, e em poucos meses a muda seca e sobra só o tronco.
+
+Em São Paulo, isso é regulado pelo **TCA (Termo de Compromisso Ambiental)**, firmado com a Secretaria do Verde e do Meio Ambiente (SVMA). O valor da muda no cálculo da compensação já inclui **2 anos de manutenção** (Decreto 53.889/2013). Uma CPI da Câmara (2016) já apontou a necessidade de ampliar esse prazo de responsabilidade. A SVMA publica a lista de TCAs em CSV no site da prefeitura, e esses dados podem alimentar o sistema.
+
+O que o sistema faz:
+- Cada muda de compensação fica ligada ao **empreendimento, ao responsável e ao número do TCA**.
+- Mostra o prazo de manutenção (garantia) e avisa quando está vencendo ou já venceu sem ninguém responsável.
+- Calcula a **taxa de sobrevivência** por obra e marca as mudas **abandonadas** (sem nenhum cuidado registrado há mais de 21 dias).
+- Gera uma **notificação pronta** para a construtora, com as mudas mortas e as coordenadas.
+- Quando a garantia acaba, a muda entra na lista do **Agente do Futuro** e na rota da prefeitura, para não ficar órfã.
+
+Como fazer de verdade:
+1. Importar o CSV de TCAs da SVMA e cruzar com o endereço das obras.
+2. Vistoria inicial com o app de campo: cadastrar as mudas de cada obra.
+3. Vender para a prefeitura como **ferramenta de fiscalização do TCA**: hoje ela não tem como saber, muda a muda, o que sobreviveu antes de dar o recebimento definitivo.
+4. Oferecer às construtoras um **relatório automático de manutenção**. Isso ajuda a cumprir o TCA e a evitar exigências de reposição.
+
+### 3.7 Agente do Futuro (participação cidadã)
+O lado público do sistema. Pode funcionar como site ou app aberto, separado do painel da prefeitura.
+- **Onde ajudar:** mudas que precisam de água agora (com a quantidade em baldes), mudas para adotar, hortas comunitárias e mutirões.
+- **Registro:** "eu reguei", "coloquei composto" e "adotei" entram no histórico da árvore e reduzem a rota do caminhão. Na versão real, com foto e localização como comprovação.
+- **Engajamento:** pontos, níveis (Semente → Floresta) e ranking por bairro.
+- **Limites claros:** o cidadão rega, cobre o solo e avisa a prefeitura. Poda, corte, plantio na calçada e adubo químico continuam com a prefeitura (o sistema orienta a abrir um chamado).
+- **Parcerias possíveis:** já existem iniciativas para conectar, como a plataforma **Sampa+Rural** (mapeia hortas e iniciativas de agricultura da cidade) e o **Adote uma Praça**. Em outras cidades há programas de adoção de árvores (Curitiba, Fortaleza) que podem servir de modelo.
+- **Próximos passos:** login simples, comprovação por foto, kits de composto com parceiros, eventos criados pelas próprias hortas e notificação quando uma muda adotada precisar de água.
+
+### 3.8 Indicadores para a prefeitura (o que justifica a compra)
 - Taxa de sobrevivência de mudas (antes e depois).
 - Litros de água por árvore viva e custo por árvore.
 - Árvores não cadastradas incorporadas ao inventário.
@@ -94,6 +121,10 @@ leitura_sensor(arvore_id, momento, umidade_solo, temperatura_solo, bateria)
 evento(arvore_id, tipo [irrigacao|adubacao|vistoria|poda|regularizacao],
        data, litros, responsavel, foto_url, obs)
 ordem_servico(id, data, tipo, equipe, rota GEOMETRY, status)
+empreendimento(id, nome, responsavel, tca_numero, data_plantio, meses_garantia, situacao)
+agente(id, nome, pontos, bairro)          -- voluntário
+cuidado(arvore_id, agente_id NULL, tipo, data, foto_url)  -- rega/adubação/adoção
+ponto_agente(id, tipo [horta|mutirao], geom, nome, quando, descricao)
 chamado(id, arvore_id NULL, geom POINT, tipo, risco, origem, descricao,
         status [aberto|atendimento|concluido], aberto_em, concluido_em, equipe_id)
 ```

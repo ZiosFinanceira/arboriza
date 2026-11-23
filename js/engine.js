@@ -9,7 +9,8 @@ window.Arbo = window.Arbo || {};
     litros: { estabelecimento: 30, consolidacao: 45, estabelecida: 60 },
     chuvaAdiaMm: 10,                // chuva prevista em 48h que adia a irrigação
     adubacaoMeses: { estabelecimento: 6, consolidacao: 12 }, // estabelecida: sem rotina
-    faseMeses: { estabelecimento: 24, consolidacao: 36 }
+    faseMeses: { estabelecimento: 24, consolidacao: 36 },
+    diasAbandono: 21               // muda nova sem rega/adubo há mais que isso = abandonada
   };
 
   const DIA = 86400000;
@@ -57,6 +58,10 @@ window.Arbo = window.Arbo || {};
     const limiarEfetivo = f === 'estabelecida' ? limiar * 0.6 : limiar;
     const base = { umidade: umid, limiar: Math.round(limiarEfetivo), fase: f, litros: 0 };
 
+    if (arv.saude === 'morta' || arv.saude === 'substituida') {
+      return { ...base, acao: 'ok', prioridade: 0, motivo: 'Muda morta: não faz sentido irrigar. Programar a substituição.' };
+    }
+
     // Adulta sem sensor: raízes profundas, vive da chuva. Sem medição real não dá para afirmar que está seca.
     if (f === 'estabelecida' && !arv.sensor) {
       return { ...base, acao: 'ok', prioridade: 0, motivo: 'Árvore estabelecida sem sensor: depende da chuva. Irrigar só em estiagem prolongada ou se a vistoria indicar estresse hídrico.' };
@@ -69,7 +74,7 @@ window.Arbo = window.Arbo || {};
       return { ...base, acao: 'adiar', prioridade: 1, motivo: `Solo seco (${umid}%), mas há ${clima.chuvaPrevista48h.toFixed(0)} mm de chuva previstos em 48h.` };
     }
     const deficit = (limiarEfetivo - umid) / limiarEfetivo; // 0..1
-    const prioridade = deficit > 0.4 || f === 'estabelecimento' ? 3 : 2;
+    const prioridade = deficit > 0.4 || f === 'estabelecimento' || arv.saude === 'estressada' ? 3 : 2;
     const litros = Math.round(PARAMS.litros[f] * (esp.agua === 'alta' ? 1.2 : esp.agua === 'baixa' ? 0.8 : 1));
     return { ...base, acao: 'irrigar', prioridade, litros, motivo: `Solo com ${umid}%, abaixo do mínimo de ${Math.round(limiarEfetivo)}% para ${esp.nome} em fase de ${nomeFase(f)}.` };
   }
@@ -90,9 +95,18 @@ window.Arbo = window.Arbo || {};
     };
   }
 
+  // Muda nova sem nenhum cuidado registrado há muito tempo = abandonada (o caso clássico das obras)
+  function abandono(arv, hoje) {
+    if (fase(arv, hoje) === 'estabelecida' || arv.saude === 'morta' || arv.saude === 'substituida') return null;
+    const datas = [arv.ultimaIrrigacao, arv.ultimaAdubacao].filter(Boolean).map(parse);
+    const ult = datas.length ? new Date(Math.max(...datas)) : parse(arv.plantio);
+    const dias = ult ? diasEntre(ult, hoje) : null;
+    return dias !== null && dias > PARAMS.diasAbandono ? dias : null;
+  }
+
   function nomeFase(f) {
     return { estabelecimento: 'estabelecimento (0–2 anos)', consolidacao: 'consolidação (2–3 anos)', estabelecida: 'estabelecida (3+ anos)' }[f];
   }
 
-  Arbo.engine = { PARAMS, idadeMeses, fase, nomeFase, umidadeSolo, recomendacaoIrrigacao, recomendacaoAdubacao };
+  Arbo.engine = { PARAMS, abandono, idadeMeses, fase, nomeFase, umidadeSolo, recomendacaoIrrigacao, recomendacaoAdubacao };
 })();

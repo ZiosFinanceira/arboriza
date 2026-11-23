@@ -7,7 +7,7 @@ Arbo.CONFIG = {
   cidade: 'São Paulo - SP',
   centro: [-23.5590, -46.6578], // região da Av. Paulista
   zoom: 17,
-  storageKey: 'arboriza.v1'
+  storageKey: 'arboriza.v2'
 };
 
 // agua: necessidade hídrica relativa | porte: tamanho adulto | calcada: adequada para calçada?
@@ -32,7 +32,16 @@ Arbo.ORIGENS = {
   'prefeitura':     { nome: 'Plantio da prefeitura', cor: '#2e7d32' },
   'autorizada':     { nome: 'Munícipe (autorizada)', cor: '#1565c0' },
   'nao-cadastrada': { nome: 'Não cadastrada',        cor: '#ef6c00' },
+  'compensacao':    { nome: 'Compensação de obra (TCA)', cor: '#00897b' },
   'osm':            { nome: 'Importada do OSM',      cor: '#6a1b9a' }
+};
+
+// Estado de saúde registrado em vistoria (pela equipe ou por um agente voluntário)
+Arbo.SAUDE = {
+  'viva':        { nome: 'Viva e saudável' },
+  'estressada':  { nome: 'Estressada (folhas secas/amarelas)' },
+  'morta':       { nome: 'Morta / seca (só o tronco)' },
+  'substituida': { nome: 'Substituída' }
 };
 
 // Árvores de exemplo (datas relativas a hoje para o protótipo sempre parecer "vivo").
@@ -52,7 +61,17 @@ Arbo.seed = function () {
     [-23.556629, -46.656845, 'aroeira',     'prefeitura',     260, 7,  120, true,  'R. Frei Caneca'],
     [-23.55991, -46.660082, 'desconhecida','nao-cadastrada', 365, 20, 999, false, 'R. Padre João Manuel'],
     [-23.556644, -46.658562, 'ipe-roxo',    'prefeitura',     700, 5,  210, true,  'R. Augusta'],
-    [-23.561454, -46.660212, 'quaresmeira', 'autorizada',     120, 3,  100, false, 'Al. Jaú']
+    [-23.561454, -46.660212, 'quaresmeira', 'autorizada',     120, 3,  100, false, 'Al. Jaú'],
+    [-23.556949, -46.65736, 'ipe-amarelo', 'compensacao', 200, 45, 999, false, 'R. Antônio Carlos', 'viva', 'emp-1'],
+    [-23.556911, -46.657598, 'quaresmeira', 'compensacao', 200, 60, 999, false, 'R. Antônio Carlos', 'morta', 'emp-1'],
+    [-23.556695, -46.657645, 'pau-brasil', 'compensacao', 200, 60, 999, false, 'R. Antônio Carlos', 'estressada', 'emp-1'],
+    [-23.556661, -46.657883, 'ipe-roxo', 'compensacao', 200, 45, 999, false, 'R. Antônio Carlos', 'viva', 'emp-1'],
+    [-23.556444, -46.657931, 'manaca', 'compensacao', 200, 70, 999, false, 'R. Antônio Carlos', 'morta', 'emp-1'],
+    [-23.55641, -46.658169, 'jacaranda', 'compensacao', 200, 60, 999, false, 'R. Antônio Carlos', 'estressada', 'emp-1'],
+    [-23.556411, -46.659674, 'oiti', 'compensacao', 800, 90, 999, false, 'R. Luís Coelho', 'morta', 'emp-2'],
+    [-23.556715, -46.65933, 'sibipiruna', 'compensacao', 800, 120, 999, false, 'R. Luís Coelho', 'viva', 'emp-2'],
+    [-23.557351, -46.658599, 'aroeira', 'compensacao', 800, 90, 999, false, 'R. Luís Coelho', 'morta', 'emp-2'],
+    [-23.557652, -46.658254, 'quaresmeira', 'compensacao', 800, 90, 999, false, 'R. Luís Coelho', 'morta', 'emp-2']
   ];
   return lista.map((r, i) => ({
     id: 'arv-' + String(i + 1).padStart(4, '0'),
@@ -62,6 +81,31 @@ Arbo.seed = function () {
     ultimaAdubacao: r[6] >= 999 ? null : d(r[6]),
     sensor: r[7],
     endereco: r[8],
+    saude: r[9] || 'viva',
+    empreendimento: r[10] || null,
+    historico: [],
     obs: ''
   }));
+};
+
+// Empreendimentos com plantio compensatório (TCA). Nomes e números FICTÍCIOS, só para o protótipo.
+Arbo.seedEmpreendimentos = function () {
+  const d = (dias) => { const t = new Date(); t.setDate(t.getDate() - dias); return t.toISOString().slice(0, 10); };
+  return [
+    { id: 'emp-1', nome: 'Residencial Jardim Paulista (exemplo)', responsavel: 'Construtora Exemplo Ltda. (fictícia)',
+      tca: 'TCA nº 000/2025 (exemplo)', plantio: d(200), mesesGarantia: 24, situacao: 'obra' },
+    { id: 'emp-2', nome: 'Edifício Corporativo Luís Coelho (exemplo)', responsavel: 'Incorporadora Modelo S.A. (fictícia)',
+      tca: 'TCA nº 000/2023 (exemplo)', plantio: d(800), mesesGarantia: 24, situacao: 'entregue' }
+  ];
+};
+
+// Pontos onde o cidadão (Agente do Futuro) pode ajudar além das árvores. Exemplos fictícios.
+Arbo.seedPontosAgente = function () {
+  const f = (dias) => { const t = new Date(); t.setDate(t.getDate() + dias); return t.toISOString().slice(0, 10); };
+  return [
+    { id: 'pt-1', tipo: 'horta', nome: 'Horta comunitária (exemplo)', lat: -23.55905, lng: -46.65745,
+      endereco: 'Praça De Robriano', quando: 'Sábados, 9h às 12h', oque: 'Plantio, rega e compostagem. Traga luva e garrafa de água.' },
+    { id: 'pt-2', tipo: 'mutirao', nome: 'Mutirão de rega e cobertura morta (exemplo)', lat: -23.561948, lng: -46.657757,
+      endereco: 'Al. Santos', data: f(5), quando: '8h às 11h', oque: 'Regar as mudas novas da rua e espalhar folhas secas no canteiro para segurar a umidade. Ferramentas fornecidas.' }
+  ];
 };
