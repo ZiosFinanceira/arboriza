@@ -67,16 +67,16 @@ window.Arbo = window.Arbo || {};
     const L = [
       ['arv-0004', null, 'poda', 'medio', 'Galhos baixos atrapalhando a passagem de ônibus.', '156', 12, 3],
       ['arv-0007', null, 'raiz-calcada', 'alto', 'Fícus levantou a calçada; pedestre tropeçou.', 'municipe', 8, 5],
-      [null, [-23.5598, -46.6585], 'risco-queda', 'urgente', 'Árvore inclinada após temporal, sobre ponto de ônibus.', 'defesa-civil', 0, 6],
+      [null, [-23.556939, -46.658869, 'R. Luís Coelho'], 'risco-queda', 'urgente', 'Árvore inclinada após temporal, sobre ponto de ônibus.', 'defesa-civil', 0, 6],
       ['arv-0013', null, 'fiacao', 'medio', 'Copa encostando na rede elétrica.', 'vistoria', 4, 2],
-      [null, [-23.5640, -46.6590], 'remocao', 'alto', 'Árvore morta em pé, tronco oco.', '156', 1, 20],
+      [null, [-23.556628, -46.657721, 'R. Antônio Carlos'], 'remocao', 'alto', 'Árvore morta em pé, tronco oco.', '156', 1, 20],
       ['arv-0012', null, 'praga', 'baixo', 'Cupim na base do tronco.', 'vistoria', 2, 1],
-      [null, [-23.5585, -46.6570], 'recuperacao', 'baixo', 'Muda com tutor quebrado e protetor danificado.', 'municipe', 15, 0],
-      [null, [-23.5662, -46.6548], 'corte', 'alto', 'Tronco rachado na bifurcação.', '156', 6, 12]
+      [null, [-23.559505, -46.656344, 'R. São Carlos do Pinhal'], 'recuperacao', 'baixo', 'Muda com tutor quebrado e protetor danificado.', 'municipe', 15, 0],
+      [null, [-23.56197, -46.655873, 'Al. Casa Branca'], 'corte', 'alto', 'Tronco rachado na bifurcação.', '156', 6, 12]
     ];
     return L.map((r, i) => ({
       id: 'ch-' + String(i + 1).padStart(4, '0'),
-      arvoreId: r[0], coords: r[1], tipo: r[2], risco: r[3], descricao: r[4], origem: r[5],
+      arvoreId: r[0], coords: r[1] ? r[1].slice(0, 2) : null, endereco: r[1] ? r[1][2] : '', tipo: r[2], risco: r[3], descricao: r[4], origem: r[5],
       abertura: atras(r[6], r[7]), status: i === 3 ? 'atendimento' : 'aberto', conclusao: null
     }));
   }

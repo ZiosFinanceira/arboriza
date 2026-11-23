@@ -5,8 +5,8 @@ window.Arbo = window.Arbo || {};
 
 Arbo.CONFIG = {
   cidade: 'São Paulo - SP',
-  centro: [-23.5614, -46.6559], // região da Av. Paulista
-  zoom: 16,
+  centro: [-23.5590, -46.6578], // região da Av. Paulista
+  zoom: 17,
   storageKey: 'arboriza.v1'
 };
 
@@ -39,20 +39,20 @@ Arbo.ORIGENS = {
 Arbo.seed = function () {
   const d = (dias) => { const t = new Date(); t.setDate(t.getDate() - dias); return t.toISOString().slice(0, 10); };
   const lista = [
-    [-23.5636, -46.6543, 'ipe-amarelo', 'prefeitura',     200, 2,  60, true,  'Al. Santos'],
-    [-23.5631, -46.6551, 'quaresmeira', 'prefeitura',     420, 6,  190, true, 'Al. Santos'],
-    [-23.5626, -46.6560, 'pau-brasil',  'prefeitura',      90, 1,  90, true,  'Al. Santos'],
-    [-23.5620, -46.6569, 'sibipiruna',  'prefeitura',    2200, 30, 400, false, 'Al. Santos'],
-    [-23.5602, -46.6548, 'oiti',        'autorizada',     300, 9,  150, false, 'R. Peixoto Gomide'],
-    [-23.5597, -46.6556, 'pitangueira', 'nao-cadastrada', 150, 12, 999, false, 'R. Peixoto Gomide'],
-    [-23.5592, -46.6563, 'ficus',       'nao-cadastrada', 900, 40, 999, false, 'R. Peixoto Gomide'],
-    [-23.5609, -46.6578, 'jacaranda',   'prefeitura',     600, 4,  200, true,  'R. Pamplona'],
-    [-23.5615, -46.6586, 'manaca',      'prefeitura',      45, 0,  45, true,   'R. Pamplona'],
-    [-23.5644, -46.6566, 'reseda',      'autorizada',     500, 15, 300, false, 'R. Haddock Lobo'],
-    [-23.5650, -46.6575, 'aroeira',     'prefeitura',     260, 7,  120, true,  'R. Haddock Lobo'],
-    [-23.5588, -46.6538, 'desconhecida','nao-cadastrada', 365, 20, 999, false, 'R. Augusta'],
-    [-23.5582, -46.6547, 'ipe-roxo',    'prefeitura',     700, 5,  210, true,  'R. Augusta'],
-    [-23.5657, -46.6555, 'quaresmeira', 'autorizada',     120, 3,  100, false, 'Al. Jaú']
+    [-23.560135, -46.659819, 'ipe-amarelo', 'prefeitura',     200, 2,  60, true,  'Al. Santos'],
+    [-23.560513, -46.659396, 'quaresmeira', 'prefeitura',     420, 6,  190, true, 'Al. Santos'],
+    [-23.561011, -46.659024, 'pau-brasil',  'prefeitura',      90, 1,  90, true,  'Al. Santos'],
+    [-23.561387, -46.658399, 'sibipiruna',  'prefeitura',    2200, 30, 400, false, 'Al. Santos'],
+    [-23.556975, -46.655458, 'oiti',        'autorizada',     300, 9,  150, false, 'R. Peixoto Gomide'],
+    [-23.557556, -46.655515, 'pitangueira', 'nao-cadastrada', 150, 12, 999, false, 'R. Peixoto Gomide'],
+    [-23.558117, -46.655321, 'ficus',       'nao-cadastrada', 900, 40, 999, false, 'R. Peixoto Gomide'],
+    [-23.56168, -46.659792, 'jacaranda',   'prefeitura',     600, 4,  200, true,  'Al. Ministro Rocha Azevedo'],
+    [-23.560563, -46.658449, 'manaca',      'prefeitura',      45, 0,  45, true,   'Al. Ministro Rocha Azevedo'],
+    [-23.557194, -46.657454, 'reseda',      'autorizada',     500, 15, 300, false, 'R. Frei Caneca'],
+    [-23.556629, -46.656845, 'aroeira',     'prefeitura',     260, 7,  120, true,  'R. Frei Caneca'],
+    [-23.55991, -46.660082, 'desconhecida','nao-cadastrada', 365, 20, 999, false, 'R. Padre João Manuel'],
+    [-23.556644, -46.658562, 'ipe-roxo',    'prefeitura',     700, 5,  210, true,  'R. Augusta'],
+    [-23.561454, -46.660212, 'quaresmeira', 'autorizada',     120, 3,  100, false, 'Al. Jaú']
   ];
   return lista.map((r, i) => ({
     id: 'arv-' + String(i + 1).padStart(4, '0'),

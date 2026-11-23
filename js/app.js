@@ -326,7 +326,7 @@
       const a = arvores.find((x) => x.id === c.arvoreId);
       if (a) return { lat: a.lat, lng: a.lng, texto: `${(ESPECIES[a.especie] || ESPECIES.desconhecida).nome} · ${a.endereco || a.id}` };
     }
-    if (c.coords) return { lat: c.coords[0], lng: c.coords[1], texto: `${c.coords[0].toFixed(5)}, ${c.coords[1].toFixed(5)}` };
+    if (c.coords) return { lat: c.coords[0], lng: c.coords[1], texto: c.endereco || `${c.coords[0].toFixed(5)}, ${c.coords[1].toFixed(5)}` };
     return null;
   }
 
