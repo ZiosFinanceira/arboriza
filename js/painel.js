@@ -43,7 +43,15 @@
     const noAno = (d) => d && String(d).slice(0, 4) === String(ano);
     const lista = (x) => (Array.isArray(x) ? x.filter((i) => i && typeof i === 'object') : []); // dados importados podem vir malformados
     const vistoriasAno = todas.reduce((s, a) => s + lista(a.vistorias).filter((v) => R.dataOk(v.data) && noAno(v.data)).length, 0);
-    const cuidadosAno = todas.reduce((s, a) => s + lista(a.historico).filter((h) => noAno(h.data)).length, 0);
+    // conta o histórico e também a última rega/adubação registrada na ficha (dados antigos ou importados podem não ter histórico)
+    const cuidadosAno = todas.reduce((s, a) => {
+      const h = lista(a.historico).filter((x) => noAno(x.data));
+      const tem = (tipo, d) => h.some((x) => x.tipo === tipo && x.data === d);
+      let n = h.length;
+      if (noAno(a.ultimaIrrigacao) && !tem('rega', a.ultimaIrrigacao)) n++;
+      if (noAno(a.ultimaAdubacao) && !tem('adubação', a.ultimaAdubacao)) n++;
+      return s + n;
+    }, 0);
     const plantadasAno = todas.filter((a) => noAno(a.plantio)).length;
     const chamadosAno = ch.filter((c) => noAno(c.abertura)).length;
     const concluidosAno = concl.filter((c) => noAno(c.conclusao)).length;

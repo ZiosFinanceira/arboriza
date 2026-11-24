@@ -4,6 +4,7 @@
   const A = Arbo.app, R = Arbo.risco, CH = Arbo.chamados, { esc, fmtData } = A;
   const $ = (s) => document.querySelector(s);
   const int = (n) => Number(n).toLocaleString('pt-BR');
+  const pl = (n, um, varios) => `${int(n)} ${Number(n) === 1 ? um : varios}`;
   const pctTxt = (x) => `${(x * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`;
   const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
   const especie = (a) => Arbo.ESPECIES[a.especie] || Arbo.ESPECIES.desconhecida;
@@ -61,7 +62,7 @@
 
     <section>
       <h2>3. Risco de queda e vistorias</h2>
-      <p>${int(I.risco.vistoriadas)} árvores (${pct(I.risco.vistoriadas)}) têm vistoria técnica. Delas, ${int(I.risco.graves)} estão com risco alto ou crítico. ${int(I.cal.vencidas.length)} vistorias estão vencidas e ${int(I.cal.pendentes)} árvores nunca foram vistoriadas; ${int(I.cal.em90)} vistorias vencem nos próximos 90 dias.</p>
+      <p>${int(I.risco.vistoriadas)} árvores (${pct(I.risco.vistoriadas)}) têm vistoria técnica. Delas, ${int(I.risco.graves)} estão com risco alto ou crítico. ${pl(I.cal.vencidas.length, 'vistoria está vencida', 'vistorias estão vencidas')} e ${pl(I.cal.pendentes, 'árvore nunca foi vistoriada', 'árvores nunca foram vistoriadas')}; ${pl(I.cal.em90, 'vistoria vence', 'vistorias vencem')} nos próximos 90 dias.</p>
       ${tabela(['Classe de risco', 'Árvores', '%'], ['critico', 'alto', 'moderado', 'baixo', 'sem-vistoria'].map((k) => [esc(R.CLASSES[k].nome), int(I.risco.porClasse[k]), pct(I.risco.porClasse[k])]), [1, 2])}
       <h3>Árvores prioritárias</h3>
       ${tabela(['Árvore', 'Endereço', 'Pontos', 'Classe', 'Última vistoria'], I.risco.fila.slice(0, 10).map((x) => [esc(especie(x.a).nome) + `<small>${esc(x.a.id)}</small>`, esc(x.a.endereco || '—'), int(x.r.pontos), esc(R.CLASSES[x.r.classe].nome), fmtData(x.r.vistoria.data)]), [2])}
