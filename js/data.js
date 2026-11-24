@@ -9,7 +9,12 @@ Arbo.CONFIG = {
   zoom: 16,
   baseEquipes: [-8.071135, -34.876066], // base das equipes (exemplo)
   storageKey: 'arboriza.v4',
-  basemap: 'osm' // 'osm' = mapa padrão; 'vetor' = desenha as ruas de js/ruas.js (usado onde imagens externas são bloqueadas)
+  basemap: 'osm', // 'osm' = mapa padrão; 'vetor' = desenha as ruas de js/ruas.js (usado onde imagens externas são bloqueadas)
+  // Endereço público do site (ex.: 'https://SEU-USUARIO.github.io/arboriza/'). É para onde o QR Code da placa aponta.
+  // Vazio = usa o endereço em que o sistema está aberto (só funciona no celular se o site já estiver publicado).
+  urlPublica: '',
+  // Para onde o cidadão manda o aviso feito pela ficha pública da árvore (QR Code). EXEMPLOS: trocar pelos canais reais.
+  contato: { orgao: 'Prefeitura do Recife (exemplo)', whatsapp: '', email: 'arborizacao@prefeitura.exemplo', telefone: '156' }
 };
 
 // agua: necessidade hídrica relativa | porte: tamanho adulto | calcada: adequada para calçada?
@@ -78,7 +83,7 @@ Arbo.seed = function () {
     [-8.062708, -34.877605, 'aroeira', 'compensacao', 800, 90, 999, false, 'R. Siqueira Campos', 'morta', 'emp-2'],
     [-8.062646, -34.87806, 'craibeira', 'compensacao', 800, 90, 999, false, 'R. Siqueira Campos', 'morta', 'emp-2']
   ];
-  return lista.map((r, i) => ({
+  const arvores = lista.map((r, i) => ({
     id: 'arv-' + String(i + 1).padStart(4, '0'),
     lat: r[0], lng: r[1], especie: r[2], origem: r[3],
     plantio: d(r[4]),
@@ -91,6 +96,8 @@ Arbo.seed = function () {
     historico: [],
     obs: ''
   }));
+  // vistorias técnicas de exemplo (js/risco.js)
+  return Arbo.risco ? Arbo.risco.seedVistorias(arvores) : arvores;
 };
 
 // Empreendimentos com plantio compensatório (TCA). Nomes e números FICTÍCIOS, só para o protótipo.

@@ -128,7 +128,7 @@
     $('#sug-aviso').textContent = '';
     const perto = lista.find((s) => s.status === 'analise' && dist(s, novoPonto) < RAIO_DUPLICADA);
     if (perto) $('#sug-aviso').textContent = `Já existe um pedido em análise a poucos metros daqui (${TIPOS[perto.tipo].toLowerCase()}). Se for o mesmo, seu envio vira um apoio a ele.`;
-    $('#dlg-sugestao').showModal();
+    $('#dlg-sugestao').returnValue = ''; $('#dlg-sugestao').showModal(); // Esc não reaproveita o último "ok"
   }
   $('#btn-cancelar-sug').onclick = () => $('#dlg-sugestao').close('cancel');
   $('#dlg-sugestao').addEventListener('close', () => {

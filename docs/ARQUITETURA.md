@@ -107,7 +107,14 @@ O lado público do sistema. Pode funcionar como site ou app aberto, separado do 
 - **Parcerias possíveis:** já existem iniciativas para conectar, como a plataforma **Sampa+Rural** (mapeia hortas e iniciativas de agricultura da cidade) e o **Adote uma Praça**. Em outras cidades há programas de adoção de árvores (Curitiba, Fortaleza) que podem servir de modelo.
 - **Próximos passos:** login simples, comprovação por foto, kits de composto com parceiros, eventos criados pelas próprias hortas e notificação quando uma muda adotada precisar de água.
 
-### 3.8 Indicadores para a prefeitura (o que justifica a compra)
+### 3.8 Risco de queda e vistoria técnica
+- **Vistoria:** DAP (cm), altura (m), inclinação (°), inclinação recente, cavidade (nenhuma/pequena/grande), rachadura, raízes (ok/levantando calçada/danificadas), galhos secos, praga, poda drástica, fiação, ocupação embaixo (baixa/média/alta) e última poda.
+- **Índice (0–100):** soma dos pontos dos defeitos × tamanho da árvore (pequena 0,6 · média 1,0 · grande 1,2) × ocupação embaixo (baixa 0,7 · média 1,0 · alta 1,3). Classes: baixo < 25 ≤ moderado < 50 ≤ alto < 75 ≤ crítico. Lógica inspirada nas avaliações de risco de arboricultura (ex.: TRAQ, da ISA); pesos a validar com engenheiro agrônomo ou florestal.
+- **Calendário:** próxima vistoria em 24/12/3/1 meses conforme a classe; no máximo 12 meses para árvore grande ou em local de muito movimento. Referência: Singapura inspeciona cada árvore a cada 6–24 meses e reduziu as falhas de árvores em cerca de 85% entre 2001 e 2018.
+- **Diversidade:** regra 10-20 (no máximo 10% de uma espécie e 20% de um gênero), contando árvores vivas e identificadas, com alerta a partir de 30 árvores.
+- **Placa com QR Code:** ficha pública sem login (`ficha.html?id=<árvore>#d=<resumo>`). Hoje o resumo (espécie, endereço, plantio, data da última vistoria) vai no link e é validado, e o `id` do endereço precisa bater com o do resumo. A nota de risco fica de fora porque mudaria depois da impressão. Com backend, a ficha busca os dados atuais pelo `id` e as placas já impressas continuam valendo. Limite atual: sem servidor, alguém pode montar um link com dados inventados; a ficha avisa que as informações são da data de emissão da placa.
+
+### 3.9 Indicadores para a prefeitura (o que justifica a compra)
 - Taxa de sobrevivência de mudas (antes e depois).
 - Litros de água por árvore viva e custo por árvore.
 - Árvores não cadastradas incorporadas ao inventário.
@@ -147,6 +154,8 @@ arvore(id, geom POINT, especie_id, origem, status, endereco, data_plantio,
        tem_sensor, criado_por, criado_em)
 especie(id, nome, nome_cientifico, necessidade_agua, porte, adequada_calcada, obs)
 leitura_sensor(arvore_id, momento, umidade_solo, temperatura_solo, bateria)
+vistoria(arvore_id, data, responsavel, dap_cm, altura_m, inclinacao_graus, inclinacao_recente,
+         cavidade, rachadura, raizes, galhos_secos, praga, poda_drastica, fiacao, alvo, ultima_poda, obs)
 evento(arvore_id, tipo [irrigacao|adubacao|vistoria|poda|regularizacao],
        data, litros, responsavel, foto_url, obs)
 ordem_servico(id, data, tipo, equipe, rota GEOMETRY, status)
@@ -187,7 +196,7 @@ Observação: o servidor público de tiles do OpenStreetMap tem política de uso
 - Backend no Supabase (tabelas acima + login por perfil: gestor, equipe de campo).
 - App de campo (pode ser o próprio site responsivo, como PWA) para cadastrar e registrar irrigações.
 - Importação da base da prefeitura parceira.
-- Relatório mensal em PDF.
+- Relatório mensal em PDF (o anual já existe no protótipo).
 
 **Fase 2, sensores:**
 - 10 a 30 sensores em um piloto e calibração do modelo de umidade.

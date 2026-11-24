@@ -343,3 +343,120 @@ body[data-aba="gastos"] .app, body[data-aba="acessos"] .app { grid-template-colu
   .chip-perfil { left: 60px; top: 56px; font-size: 12px; }
   body[data-aba="gastos"] .app, body[data-aba="acessos"] .app { grid-template-columns: 1fr; }
 }
+
+/* =============== risco de queda e vistoria =============== */
+.campos-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+dialog .dica { margin: -6px 0 12px; }
+#dlg-vistoria { width: min(560px, 94vw); }
+.defeitos { border: 1px solid var(--borda); border-radius: var(--r); padding: 8px 12px 2px; margin: 0 0 12px; }
+.defeitos legend { font-size: 13px; font-weight: 600; color: var(--suave); padding: 0 4px; }
+.defeitos label.check { margin-bottom: 8px; }
+.selo-risco { display: inline-block; font-family: Sora, Figtree, sans-serif; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 999px; color: #fff; background: var(--cor); white-space: nowrap; }
+.selo-risco.moderado { color: #5c4300; }
+.selo-risco.sem-vistoria { background: var(--fundo); color: var(--suave); border: 1px dashed #b5c0bc; }
+.risco-topo { display: flex; align-items: center; gap: 10px; }
+.risco-topo .medidor { flex: 1; margin: 0; }
+.cartao-risco.grave { border-color: #f0b8ad; background: #fffaf8; }
+.motivos { list-style: none; margin: 10px 0 4px; padding: 0; font-size: 13px; }
+.motivos li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px dashed var(--borda); }
+.motivos b { font-family: Sora, Figtree, sans-serif; font-variant-numeric: tabular-nums; color: var(--suave); }
+.vencida { color: #b8301d; font-weight: 600; }
+.pin-risco { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-family: Sora, Figtree, sans-serif; font-weight: 800; font-size: 12px; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.4); cursor: pointer; }
+.pin-risco.alto { background: #ef6c00; }
+.pin-risco.critico { background: #c62828; }
+.legenda i.tri { border-radius: 50%; }
+@media (max-width: 900px) { .campos-3 { grid-template-columns: 1fr 1fr; } }
+
+/* =============== painel =============== */
+body[data-aba="painel"] .app { grid-template-columns: 84px minmax(520px, 44vw) 1fr; }
+.acoes-painel { display: flex; gap: 8px; flex-wrap: wrap; }
+.sub-secao { margin: 6px 0 0; font-size: 13px; color: var(--suave); font-weight: 600; }
+.pilha { display: flex; height: 16px; border-radius: 8px; overflow: hidden; gap: 2px; background: var(--fundo); }
+.pilha-leg { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; }
+.pilha-leg li { display: flex; align-items: center; gap: 6px; }
+.pilha-leg i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.pilha-leg b { font-family: Sora, Figtree, sans-serif; }
+.mini-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.mini-kpis div { background: var(--fundo); border-radius: var(--r); padding: 9px 10px; }
+.mini-kpis b { display: block; font-family: Sora, Figtree, sans-serif; font-size: 19px; font-weight: 600; }
+.mini-kpis span { display: block; font-size: 12px; color: var(--suave); line-height: 1.25; margin-top: 2px; }
+.mini-kpis .vermelho { background: var(--flamboyant-claro); } .mini-kpis .vermelho b { color: var(--flamboyant); }
+.mini-kpis .alerta { background: var(--sol-claro); } .mini-kpis .alerta b { color: #8a6100; }
+.data-vist { font-size: 12.5px; font-weight: 600; white-space: nowrap; color: var(--suave); }
+.barras-div { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.barras-div li { display: grid; grid-template-columns: 130px 1fr 52px; align-items: center; gap: 10px; font-size: 13.5px; }
+.barras-div li b { text-align: right; font-family: Sora, Figtree, sans-serif; font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
+.trilho-div { position: relative; height: 10px; background: var(--fundo); border-radius: 5px; }
+.trilho-div div { height: 100%; background: var(--mar); border-radius: 5px; }
+.trilho-div i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--tinta); opacity: .55; }
+.barras-div li.alerta .trilho-div div { background: var(--flamboyant); }
+.barras-div li.alerta b { color: var(--flamboyant); }
+.ok-txt { color: var(--folha); font-weight: 600; }
+.tipos-ch { list-style: none; margin: 0; padding: 0; font-size: 13.5px; }
+.tipos-ch li { display: flex; justify-content: space-between; padding: 6px 2px; border-bottom: 1px solid var(--borda); }
+.tipos-ch b { font-family: Sora, Figtree, sans-serif; }
+@media (max-width: 900px) {
+  body[data-aba="painel"] .app { grid-template-columns: 1fr; }
+  .mini-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .barras-div li { grid-template-columns: 100px 1fr 48px; }
+}
+.data-vist.vencida { color: #b8301d; }
+
+/* =============== relatório anual (tela e impressão) =============== */
+#relatorio { display: none; }
+body.imprimindo-relatorio { overflow: auto; background: #fff; }
+body.imprimindo-relatorio > :not(#relatorio) { display: none !important; }
+body.imprimindo-relatorio #relatorio { display: block; max-width: 820px; margin: 0 auto; padding: 24px 28px 48px; color: #14211e; font-size: 12.5px; line-height: 1.5; }
+.rel-barra { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+.rel-capa { border-bottom: 3px solid var(--mangue); padding-bottom: 14px; margin-bottom: 18px; }
+.rel-marca { font-family: Sora, Figtree, sans-serif; font-weight: 700; color: var(--mar); font-size: 13px; }
+#relatorio h1 { font-size: 26px; margin: 6px 0 6px; line-height: 1.15; }
+#relatorio h2 { font-size: 16px; margin: 22px 0 8px; color: var(--mangue); break-after: avoid; }
+#relatorio h3 { font-size: 13.5px; margin: 14px 0 6px; break-after: avoid; }
+#relatorio p { margin: 0 0 8px; }
+.rel-nota { color: var(--suave); font-size: 11.5px; }
+.rel-nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.rel-num { border: 1px solid var(--borda); border-radius: 8px; padding: 8px 10px; break-inside: avoid; }
+.rel-num b { display: block; font-family: Sora, Figtree, sans-serif; font-size: 20px; color: var(--mangue); }
+.rel-num span { display: block; font-size: 11px; color: var(--suave); line-height: 1.3; }
+#relatorio table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 11.5px; break-inside: auto; }
+#relatorio tr { break-inside: avoid; }
+#relatorio th { text-align: left; background: var(--mar-claro); color: var(--mangue); padding: 5px 7px; font-weight: 600; }
+#relatorio td { padding: 5px 7px; border-bottom: 1px solid var(--borda); vertical-align: top; }
+#relatorio td small { display: block; color: var(--suave); font-size: 10px; }
+#relatorio .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rel-alerta { color: #b8301d; }
+.rel-notas { margin-top: 18px; border-top: 1px solid var(--borda); padding-top: 4px; color: var(--suave); font-size: 11px; }
+@media print {
+  @page { size: A4; margin: 16mm 14mm; }
+  .no-print { display: none !important; }
+  body.imprimindo-relatorio #relatorio { padding: 0; max-width: none; }
+  #relatorio section { break-inside: auto; }
+}
+
+/* =============== placa com QR Code =============== */
+#dlg-placa { width: min(560px, 94vw); }
+#placa-previa { margin: 4px 0 12px; display: flex; justify-content: center; }
+#placa-aviso:empty { display: none; }
+.placa { width: 110mm; border: 2px solid var(--mangue); border-radius: 10px; overflow: hidden; background: #fff; color: var(--tinta); font-family: Figtree, system-ui, sans-serif; }
+.placa-topo { display: flex; justify-content: space-between; align-items: center; background: var(--mangue); color: #fff; padding: 6px 10px; font-size: 11px; gap: 8px; }
+.placa-topo b { font-family: Sora, Figtree, sans-serif; font-size: 13px; color: #9be3b0; }
+.placa-corpo { display: grid; grid-template-columns: 44mm 1fr; gap: 10px; padding: 10px; align-items: center; }
+.placa-qr svg { width: 100%; height: auto; display: block; stroke: none; }
+.placa-nome { font-family: Sora, Figtree, sans-serif; font-weight: 700; font-size: 17px; line-height: 1.15; }
+.placa-cient { font-style: italic; color: var(--suave); font-size: 11.5px; }
+.placa-id { font-family: Sora, Figtree, sans-serif; font-weight: 600; font-size: 12px; margin-top: 6px; color: var(--mangue); }
+.placa-txt p { font-size: 10.5px; line-height: 1.35; margin: 6px 0 0; color: var(--suave); }
+#placa-impressao { display: none; }
+body.imprimindo-placa { overflow: auto; background: #fff; }
+body.imprimindo-placa > :not(#placa-impressao) { display: none !important; }
+body.imprimindo-placa #placa-impressao { display: block; padding: 24px; }
+@media print {
+  body.imprimindo-placa #placa-impressao { padding: 0; }
+  .placa { break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* selos sobre o mapa não se sobrepõem quando o painel lateral fica largo */
+.chip-perfil, .chip-clima { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip-perfil { max-width: calc(50% - 80px); }
+.chip-clima { max-width: calc(50% - 24px); }

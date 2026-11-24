@@ -24,6 +24,8 @@
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
     <symbol id="i-moeda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2s1.3 1.7 3 2 3 .9 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/></symbol>
     <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-painel" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></symbol>
     <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
   </svg>
 
@@ -108,6 +110,7 @@
   <main class="app" id="app">
     <nav class="trilho" aria-label="Seções">
       <div class="trilho-logo" title="Arboriza"><svg><use href="#i-arvore"/></svg></div>
+      <button class="aba" data-aba="painel" data-perm="ver_painel"><svg><use href="#i-painel"/></svg><span>Painel</span></button>
       <button class="aba ativa" data-aba="arvores" data-perm="ver_arvores"><svg><use href="#i-arvore"/></svg><span>Árvores</span></button>
       <button class="aba" data-aba="os" data-perm="ver_os minhas_os"><svg><use href="#i-lista"/></svg><span>Serviços</span></button>
       <button class="aba" data-aba="controle" data-perm="ver_chamados"><svg><use href="#i-alerta"/></svg><span>Chamados</span><b id="badge-vermelhos" class="badge oculto"></b></button>
@@ -125,6 +128,26 @@
     </nav>
 
     <aside class="painel">
+      <!-- Painel de indicadores -->
+      <section class="conteudo oculto" id="aba-painel">
+        <header class="sec-head"><h2>Painel</h2><p>Os números da arborização num lugar só. Atualiza a cada vistoria, cuidado ou chamado registrado.</p></header>
+        <div class="kpis" id="kpis-painel"></div>
+        <div class="acoes-painel">
+          <button class="btn primario" data-relatorio>Relatório anual (PDF)</button>
+          <button class="btn" data-csv-arvores>Planilha das árvores (CSV)</button>
+        </div>
+        <h3 class="secao">Risco de queda</h3>
+        <div id="painel-risco" class="bloco"></div>
+        <h3 class="secao">Calendário de vistoria</h3>
+        <div id="painel-calendario" class="bloco"></div>
+        <h3 class="secao">Diversidade de espécies</h3>
+        <div id="painel-diversidade" class="bloco"></div>
+        <h3 class="secao">Mudas</h3>
+        <div id="painel-mudas" class="bloco"></div>
+        <h3 class="secao" id="painel-chamados-titulo">Chamados</h3>
+        <div id="painel-chamados" class="bloco"></div>
+      </section>
+
       <!-- Árvores -->
       <section class="conteudo" id="aba-arvores">
         <header class="sec-head"><h2>Árvores</h2><p id="cidade"></p></header>
@@ -137,6 +160,8 @@
             <option value="adiar">Adiar por chuva</option>
             <option value="adubar">Precisa adubar</option>
             <option value="inadequada">Espécie inadequada</option>
+            <option value="risco">Risco de queda alto ou crítico</option>
+            <option value="vistoria">Vistoria vencida ou pendente</option>
           </select>
         </div>
         <button id="btn-mapear" class="btn primario" data-perm="mapear_arvore">Mapear árvore</button>
@@ -241,6 +266,7 @@
         <p class="ajuda">Busca pontos <code>natural=tree</code> mapeados pela comunidade. Aproxime o mapa antes.</p>
         <button id="btn-exportar" class="btn">Exportar árvores (GeoJSON)</button>
         <button id="btn-csv-ch" class="btn">Exportar chamados (planilha CSV)</button>
+        <button class="btn" data-csv-arvores>Exportar árvores com risco e vistoria (planilha CSV)</button>
         <label class="btn" data-perm="importar_dados">Importar GeoJSON <input type="file" id="inp-importar" accept=".json,.geojson" hidden></label>
         <button id="btn-reset" class="btn perigo" data-perm="restaurar_dados">Restaurar dados de exemplo</button>
       </section>
@@ -326,6 +352,56 @@
     </form>
   </dialog>
 
+  <dialog id="dlg-vistoria">
+    <form id="form-vistoria" method="dialog">
+      <h3>Vistoria técnica</h3>
+      <p class="ajuda" id="vist-arvore"></p>
+      <div class="campos-2">
+        <label>Data <input type="date" name="data" required></label>
+        <label>Última poda de manutenção <input type="date" name="ultimaPoda"></label>
+      </div>
+      <div class="campos-3">
+        <label>DAP (cm) <input type="number" name="dap" min="0" max="500" step="any" inputmode="numeric" placeholder="Ex.: 35" title="Diâmetro do tronco a 1,30 m do chão"></label>
+        <label>Altura (m) <input type="number" name="altura" min="0" max="80" step="any" inputmode="decimal" placeholder="Ex.: 8"></label>
+        <label>Inclinação (°) <input type="number" name="inclinacao" min="0" max="90" step="any" inputmode="numeric" placeholder="0"></label>
+      </div>
+      <p class="ajuda dica">DAP: diâmetro do tronco a 1,30 m do chão (circunferência ÷ 3,14).</p>
+      <div class="campos-2">
+        <label>Cavidade ou podridão no tronco <select name="cavidade" id="sel-vist-cavidade"></select></label>
+        <label>Raízes <select name="raizes" id="sel-vist-raizes"></select></label>
+      </div>
+      <label>Ocupação embaixo da árvore (alvo) <select name="alvo" id="sel-vist-alvo"></select></label>
+      <fieldset class="defeitos">
+        <legend>Marque o que foi observado</legend>
+        <label class="check"><input type="checkbox" name="inclinacaoRecente"> Inclinação recente (solo levantado na base)</label>
+        <label class="check"><input type="checkbox" name="rachadura"> Rachadura no tronco ou na bifurcação</label>
+        <label class="check"><input type="checkbox" name="galhosSecos"> Galhos secos, quebrados ou pendurados</label>
+        <label class="check"><input type="checkbox" name="praga"> Praga ou fungo (cupim, broca, orelha-de-pau)</label>
+        <label class="check"><input type="checkbox" name="podaDrastica"> Sinais de poda drástica</label>
+        <label class="check"><input type="checkbox" name="fiacao"> Copa em conflito com a fiação</label>
+      </fieldset>
+      <label>Observações <textarea name="obs" rows="2"></textarea></label>
+      <div class="acoes">
+        <button type="button" id="btn-cancelar-vist" class="btn">Cancelar</button>
+        <button value="ok" class="btn primario">Salvar vistoria</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-placa">
+    <h3>Placa com QR Code</h3>
+    <p class="ajuda">Imprima e fixe no tronco ou no protetor da árvore. Quem apontar a câmera do celular vê a ficha da árvore e pode avisar a prefeitura.</p>
+    <p class="aviso-sug" id="placa-aviso"></p>
+    <div id="placa-previa"></div>
+    <label class="campo">Link da ficha pública <input id="placa-link" readonly></label>
+    <div class="acoes">
+      <button type="button" id="placa-fechar" class="btn">Fechar</button>
+      <button type="button" id="placa-copiar" class="btn">Copiar link</button>
+      <a id="placa-abrir" class="btn" target="_blank" rel="noopener">Abrir ficha pública</a>
+      <button type="button" id="placa-imprimir" class="btn primario">Imprimir placa</button>
+    </div>
+  </dialog>
+
   <dialog id="dlg-confirmar">
     <form method="dialog">
       <p id="confirmar-texto" style="margin:0 0 16px;font-size:15px"></p>
@@ -340,14 +416,21 @@
   <script src="js/data.js"></script>
   <script src="js/permissoes.js"></script>
   <script src="js/engine.js"></script>
+  <script src="js/risco.js"></script>
   <script src="js/chamados.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/vendor/qrcode.js"></script>
+  <script src="js/placa.js"></script>
+  <script src="js/vistoria.js"></script>
   <script src="js/obras.js"></script>
   <script src="js/agente.js"></script>
   <script src="js/sugestoes.js"></script>
   <script src="js/os.js"></script>
   <script src="js/gastos.js"></script>
   <script src="js/acessos.js"></script>
+  <script src="js/painel.js"></script>
+  <script src="js/relatorio.js"></script>
+  <script src="js/csv.js"></script>
   <script src="js/acesso.js"></script>
 </body>
 </html>

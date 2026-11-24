@@ -118,6 +118,7 @@ Atenciosamente,
   });
 
   A.empreendimento = (id) => emps.find((x) => x.id === id);
+  A.resumoObras = () => emps.map((e) => ({ e, r: resumo(e) })); // usado pelo relatório anual
   A.renderers.push(render);
   A.aoRestaurar.push(() => { emps = Arbo.seedEmpreendimentos(); salvar(); });
   salvar();

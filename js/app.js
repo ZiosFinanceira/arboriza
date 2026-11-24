@@ -5,7 +5,8 @@
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmtData = (s) => (s ? new Date(s + 'T12:00:00').toLocaleDateString('pt-BR') : '—');
-  const hojeISO = () => new Date().toISOString().slice(0, 10);
+  // data de hoje no fuso do aparelho (toISOString usava UTC: depois das 21h no Brasil já marcava o dia seguinte)
+  const hojeISO = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
 
   const CH = Arbo.chamados;
   let arvores = carregar();
@@ -105,6 +106,8 @@
       if (fa === 'irrigar' || fa === 'adiar') return irr.acao === fa;
       if (fa === 'adubar') return adu.acao === 'adubar';
       if (fa === 'inadequada') return !esp.calcada;
+      if (fa === 'risco') return ['alto', 'critico'].includes(Arbo.risco.avaliar(a, esp, HOJE).classe);
+      if (fa === 'vistoria') { const p = Arbo.risco.proximaVistoria(a, esp, HOJE); return !!(p && p.vencida); }
       return true;
     });
   }
@@ -340,7 +343,7 @@
     const f = $('#form-arvore');
     f.reset();
     f.plantio.value = hojeISO();
-    $('#dlg-arvore').showModal();
+    $('#dlg-arvore').returnValue = ''; $('#dlg-arvore').showModal(); // Esc não reaproveita o último "ok"
   }
 
   $('#btn-cancelar-form').onclick = () => $('#dlg-arvore').close('cancel');
@@ -508,7 +511,7 @@
     }
     $('#ch-local').textContent = txt;
     ['tipo', 'risco', 'origem', 'descricao'].forEach((k) => { if (alvo[k]) f[k].value = alvo[k]; });
-    $('#dlg-chamado').showModal();
+    $('#dlg-chamado').returnValue = ''; $('#dlg-chamado').showModal(); // Esc não reaproveita o último "ok"
   }
   $('#btn-cancelar-ch').onclick = () => $('#dlg-chamado').close('cancel');
   $('#dlg-chamado').addEventListener('close', () => {
@@ -558,7 +561,8 @@
       linhas.push([c.id, CH.TIPOS[c.tipo], CH.RISCOS[c.risco].nome, CH.STATUS[c.status], CH.ORIGENS_CHAMADO[c.origem] || c.origem,
         c.abertura, c.conclusao || '', CH.diasAberto(c, agora).toFixed(1), CH.faixa(c, agora).nome, loc.lat ?? '', loc.lng ?? '', c.arvoreId || '', c.descricao]);
     });
-    const csv = linhas.map((l) => l.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\n');
+    const cel = Arbo.csvCelula || ((v) => `"${String(v).replace(/"/g, '""')}"`); // js/csv.js neutraliza fórmulas
+    const csv = linhas.map((l) => l.map(cel).join(';')).join('\n');
     const url = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
     const link = Object.assign(document.createElement('a'), { href: url, download: `chamados-${hojeISO()}.csv` });
     link.click(); URL.revokeObjectURL(url);
@@ -696,7 +700,7 @@
     mapa, analisar, salvar, salvarCh, selecionar, selecionarChamado, atualizar, registrar, abrirFormChamado, setModoMapear,
     esc, fmtData, hojeISO, abaAtiva: () => document.querySelector('.aba.ativa').dataset.aba,
     renderers: [], detalhe: [], aoRestaurar: [], aoCriarChamado: [], aoIniciar: [],
-    criarChamado, localChamado, fecharDetalhe, toast, confirmar,
+    criarChamado, localChamado, fecharDetalhe, toast, confirmar, filtradas, modoMapear: () => modoMapear,
     modoClique: (msg, fn) => { fn.msg = msg; setModoMapear(fn); }
   };
 

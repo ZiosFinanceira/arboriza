@@ -73,7 +73,7 @@
     const f = $('#form-despesa'); f.reset(); f.data.value = A.hojeISO();
     $('#sel-desp-cat').innerHTML = Object.entries(CAT).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
     $('#sel-desp-reg').innerHTML = REGIOES.map((r) => `<option>${esc(r)}</option>`).join('');
-    $('#dlg-despesa').showModal();
+    $('#dlg-despesa').returnValue = ''; $('#dlg-despesa').showModal(); // Esc não reaproveita o último "ok"
   };
   $('#btn-cancelar-desp').onclick = () => $('#dlg-despesa').close('cancel');
   $('#dlg-despesa').addEventListener('close', () => {
@@ -85,6 +85,16 @@
     A.toast('Despesa lançada'); render();
   });
 
+  // resumo usado pelo relatório anual (js/relatorio.js)
+  A.resumoGastos = () => {
+    const total = Object.values(g.orcamento).reduce((s, v) => s + v, 0);
+    const doAno = g.despesas.filter((d) => String(d.data).slice(0, 4) === String(g.ano));
+    const exec = doAno.reduce((s, d) => s + d.valor, 0);
+    const porCat = Object.entries(CAT).map(([k, nome]) => ({ nome, orcado: g.orcamento[k] || 0, executado: doAno.filter((d) => d.cat === k).reduce((s, d) => s + d.valor, 0) }));
+    const vivas = A.arvores.filter((a) => a.saude !== 'morta' && a.origem !== 'planejada').length;
+    const mortas = A.arvores.filter((a) => a.saude === 'morta').length;
+    return { ano: g.ano, total, exec, porCat, porArvoreViva: exec / Math.max(vivas, 1), perdidoMudas: mortas * CUSTO_MUDA, custoMuda: CUSTO_MUDA };
+  };
   A.renderers.push(() => { if (A.abaAtiva() === 'gastos') render(); });
   A.aoRestaurar.push(() => { g = semente(); salvar(); });
 })();
