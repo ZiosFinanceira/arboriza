@@ -460,3 +460,9 @@ body.imprimindo-placa #placa-impressao { display: block; padding: 24px; }
 .chip-perfil, .chip-clima { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chip-perfil { max-width: calc(50% - 80px); }
 .chip-clima { max-width: calc(50% - 24px); }
+
+/* celular: botão da área restrita abaixo do formulário, sem cobrir os campos */
+@media (max-width: 900px) {
+  .btn-restrita { position: static; margin: 4px auto 0; }
+  .acesso-lado { padding-bottom: 32px; }
+}
