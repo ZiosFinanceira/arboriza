@@ -12,7 +12,7 @@ Arbo.CONFIG = {
   basemap: 'osm', // 'osm' = mapa padrão; 'vetor' = desenha as ruas de js/ruas.js (usado onde imagens externas são bloqueadas)
   // Endereço público do site (ex.: 'https://SEU-USUARIO.github.io/arboriza/'). É para onde o QR Code da placa aponta.
   // Vazio = usa o endereço em que o sistema está aberto (só funciona no celular se o site já estiver publicado).
-  urlPublica: '',
+  urlPublica: 'https://ziosfinanceira.github.io/arboriza/',
   // Para onde o cidadão manda o aviso feito pela ficha pública da árvore (QR Code). EXEMPLOS: trocar pelos canais reais.
   contato: { orgao: 'Prefeitura do Recife (exemplo)', whatsapp: '', email: 'arborizacao@prefeitura.exemplo', telefone: '156' }
 };

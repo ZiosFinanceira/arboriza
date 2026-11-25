@@ -4,6 +4,8 @@ Protótipo (exemplo em **Recife: Recife Antigo e Marco Zero**) de um sistema par
 
 > Visão completa, arquitetura, roadmap e modelo de negócio: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 
+**Site publicado:** https://ziosfinanceira.github.io/arboriza/
+
 ## O que o protótipo já faz
 
 - 🔐 **Três entradas com permissões próprias:**
