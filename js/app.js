@@ -343,6 +343,7 @@
     const f = $('#form-arvore');
     f.reset();
     f.plantio.value = hojeISO();
+    if (Arbo.app.aoAbrirFormArvore) Arbo.app.aoAbrirFormArvore();
     $('#dlg-arvore').returnValue = ''; $('#dlg-arvore').showModal(); // Esc não reaproveita o último "ok"
   }
 
@@ -358,9 +359,11 @@
       especie: f.especie.value, origem: f.origem.value,
       endereco: f.endereco.value.trim(), plantio: f.plantio.value,
       ultimaIrrigacao: f.plantio.value, ultimaAdubacao: null,
-      sensor: f.sensor.checked, obs: f.obs.value.trim()
+      sensor: f.sensor.checked, obs: f.obs.value.trim(),
+      ...(Arbo.app.dadosLocalForm ? Arbo.app.dadosLocalForm() : {})
     };
     arvores.push(nova);
+    Arbo.auditar('Mapeou árvore', `${nova.id} · ${(ESPECIES[nova.especie] || ESPECIES.desconhecida).nome}`);
     pontoNovo = null;
     salvar();
     selecionar(nova.id, false);

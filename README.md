@@ -28,6 +28,9 @@ Protótipo (exemplo em **Recife: Recife Antigo e Marco Zero**) de um sistema par
 - 🏗️ **Obras (TCA):** acompanha as mudas do plantio compensatório de cada empreendimento: responsável, prazo de manutenção, taxa de sobrevivência, mudas mortas ou abandonadas e notificação pronta para a construtora.
 - 💚 **Agente do Futuro:** o lado do cidadão. Mostra as mudas que precisam de rega ou de adoção, as hortas comunitárias e os mutirões. Cada cuidado registrado entra no histórico da árvore e vale pontos.
 - 🩺 **Saúde da muda:** viva, estressada, morta ou substituída. Ao marcar como morta, o sistema já abre um chamado de substituição.
+- 🌱 **Espécie certa para cada calçada:** ao mapear uma árvore ou aprovar um local de plantio, o sistema pede a largura da calçada e se há fiação, e indica as espécies que cabem (nativas primeiro). Na ficha, avisa quando a árvore está no lugar errado. Moradores têm a calculadora "Qual árvore cabe na minha calçada?". Regras em `js/especies.js` (testes: `node tests/especies.test.js`).
+- 📄 **Laudo de poda ou supressão:** rascunho pronto para o responsável técnico assinar, com vistoria, índice de risco, recomendação, prazo, medidas de segurança e compensação. Pode abrir o chamado junto. `js/laudo.js`
+- 🌧️ **Alerta de chuva forte:** a coordenação ativa quando a Defesa Civil avisa; o sistema cria as vistorias pós-chuva das árvores de maior risco na fila das equipes e avisa todos os perfis, inclusive moradores. `js/alerta.js`
 - 📥 Importar árvores do **OpenStreetMap** da área visível; exportar e importar **GeoJSON**.
 
 ### Novidades (novembro de 2026)

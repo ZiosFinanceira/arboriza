@@ -466,3 +466,33 @@ body.imprimindo-placa #placa-impressao { display: block; padding: 24px; }
   .btn-restrita { position: static; margin: 4px auto 0; }
   .acesso-lado { padding-bottom: 32px; }
 }
+
+/* espécie certa */
+.rec-especies:empty { display: none; }
+.rec-especies, [data-sg-rec] { background: var(--folha-claro); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.esp-lista { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; }
+.esp-lista li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; }
+.esp-lista i { color: var(--suave); font-size: 12.5px; }
+.esp-tag { margin-left: auto; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: var(--fundo); color: var(--suave); }
+.esp-tag.nativa { background: var(--papel); color: var(--folha); }
+#agente-especie .alerta-esp, .rec-especies .alerta-esp { margin: 6px 0 0; }
+
+/* laudo */
+.laudo-rascunho { border: 2px dashed var(--flamboyant); color: #b8301d; font-weight: 700; text-align: center; padding: 6px; margin-bottom: 14px; font-size: 12px; }
+.laudo-tab { width: 100%; border-collapse: collapse; margin: 6px 0 10px; }
+.laudo-tab th, .laudo-tab td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--borda); vertical-align: top; }
+.laudo-tab th { width: 34%; color: var(--suave); font-weight: 600; }
+.laudo-tab .num { text-align: right; width: 70px; }
+.laudo-assina { margin-top: 10px; break-inside: avoid; }
+.laudo-linha { border-bottom: 1px solid #14211e; width: 60%; height: 48px; margin: 8px 0 6px; }
+#dlg-laudo { width: min(560px, 94vw); }
+
+/* alerta de chuva */
+.chip-alerta { position: absolute; left: 50%; transform: translateX(-50%); top: 64px; z-index: 940; max-width: min(560px, calc(100% - 40px)); background: #1f4fa8; color: #fff; padding: 10px 16px; border-radius: 14px; font-size: 13.5px; line-height: 1.4; box-shadow: var(--sombra-alta); text-align: center; }
+.alerta-ativo, .alerta-off { border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.alerta-ativo { background: #e7eefb; border: 1px solid #b9cbef; color: #173b7a; }
+.alerta-ativo .barra-trilho div { background: #1f4fa8; }
+.alerta-off { background: var(--fundo); color: var(--suave); }
+.alerta-off b { color: var(--tinta); }
+.alerta-ativo .btn, .alerta-off .btn { align-self: flex-start; }
+@media (max-width: 900px) { .chip-alerta { top: 100px; font-size: 12.5px; } }

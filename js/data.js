@@ -19,20 +19,22 @@ Arbo.CONFIG = {
 
 // agua: necessidade hídrica relativa | porte: tamanho adulto | calcada: adequada para calçada?
 Arbo.ESPECIES = {
-  'ipe-amarelo':  { nome: 'Ipê-amarelo',        cientifico: 'Handroanthus chrysotrichus', agua: 'baixa', porte: 'medio',   calcada: true },
-  'ipe-roxo':     { nome: 'Ipê-roxo',           cientifico: 'Handroanthus impetiginosus', agua: 'baixa', porte: 'grande',  calcada: true, obs: 'Exige calçada larga e sem fiação baixa.' },
-  'quaresmeira':  { nome: 'Quaresmeira',        cientifico: 'Pleroma granulosum',         agua: 'media', porte: 'pequeno', calcada: true },
-  'manaca':       { nome: 'Manacá-da-serra',    cientifico: 'Pleroma mutabile',           agua: 'media', porte: 'pequeno', calcada: true },
-  'pau-brasil':   { nome: 'Pau-brasil',         cientifico: 'Paubrasilia echinata',       agua: 'media', porte: 'medio',   calcada: true },
-  'sibipiruna':   { nome: 'Sibipiruna',         cientifico: 'Cenostigma pluviosum',       agua: 'media', porte: 'grande',  calcada: true, obs: 'Copa ampla; evitar sob fiação.' },
-  'oiti':         { nome: 'Oiti',               cientifico: 'Moquilea tomentosa',         agua: 'media', porte: 'medio',   calcada: true },
-  'reseda':       { nome: 'Resedá',             cientifico: 'Lagerstroemia indica',       agua: 'baixa', porte: 'pequeno', calcada: true },
-  'jacaranda':    { nome: 'Jacarandá-mimoso',   cientifico: 'Jacaranda mimosifolia',      agua: 'media', porte: 'medio',   calcada: true },
-  'aroeira':      { nome: 'Aroeira-pimenteira', cientifico: 'Schinus terebinthifolia',    agua: 'baixa', porte: 'pequeno', calcada: true },
-  'pitangueira':  { nome: 'Pitangueira',        cientifico: 'Eugenia uniflora',           agua: 'alta',  porte: 'pequeno', calcada: true },
-  'craibeira':    { nome: 'Craibeira',          cientifico: 'Tabebuia aurea',             agua: 'baixa', porte: 'medio',   calcada: true },
-  'flamboyant':   { nome: 'Flamboyant',         cientifico: 'Delonix regia',              agua: 'media', porte: 'grande',  calcada: false, obs: 'Raízes superficiais e copa muito larga: melhor em praças e canteiros largos.' },
-  'ficus':        { nome: 'Fícus',              cientifico: 'Ficus benjamina',            agua: 'alta',  porte: 'grande',  calcada: false, obs: 'Raízes agressivas: quebram calçada e tubulação. Candidata a substituição.' },
+  'ipe-amarelo':  { nome: 'Ipê-amarelo',        cientifico: 'Handroanthus chrysotrichus', agua: 'baixa', porte: 'medio',   calcada: true, origem: 'nativa' },
+  'ipe-roxo':     { nome: 'Ipê-roxo',           cientifico: 'Handroanthus impetiginosus', agua: 'baixa', porte: 'grande',  calcada: true, obs: 'Exige calçada larga e sem fiação baixa.', origem: 'nativa' },
+  'quaresmeira':  { nome: 'Quaresmeira',        cientifico: 'Pleroma granulosum',         agua: 'media', porte: 'pequeno', calcada: true, origem: 'nativa' },
+  'manaca':       { nome: 'Manacá-da-serra',    cientifico: 'Pleroma mutabile',           agua: 'media', porte: 'pequeno', calcada: true, origem: 'nativa' },
+  'pau-brasil':   { nome: 'Pau-brasil',         cientifico: 'Paubrasilia echinata',       agua: 'media', porte: 'medio',   calcada: true, origem: 'nativa' },
+  'sibipiruna':   { nome: 'Sibipiruna',         cientifico: 'Cenostigma pluviosum',       agua: 'media', porte: 'grande',  calcada: true, obs: 'Copa ampla; evitar sob fiação.', origem: 'nativa' },
+  'oiti':         { nome: 'Oiti',               cientifico: 'Moquilea tomentosa',         agua: 'media', porte: 'medio',   calcada: true, origem: 'nativa' },
+  'reseda':       { nome: 'Resedá',             cientifico: 'Lagerstroemia indica',       agua: 'baixa', porte: 'pequeno', calcada: true, origem: 'exotica' },
+  'jacaranda':    { nome: 'Jacarandá-mimoso',   cientifico: 'Jacaranda mimosifolia',      agua: 'media', porte: 'medio',   calcada: true, origem: 'exotica' },
+  'aroeira':      { nome: 'Aroeira-pimenteira', cientifico: 'Schinus terebinthifolia',    agua: 'baixa', porte: 'pequeno', calcada: true, origem: 'nativa' },
+  'pitangueira':  { nome: 'Pitangueira',        cientifico: 'Eugenia uniflora',           agua: 'alta',  porte: 'pequeno', calcada: true, origem: 'nativa' },
+  'craibeira':    { nome: 'Craibeira',          cientifico: 'Tabebuia aurea',             agua: 'baixa', porte: 'medio',   calcada: true, origem: 'nativa' },
+  'flamboyant':   { nome: 'Flamboyant',         cientifico: 'Delonix regia',              agua: 'media', porte: 'grande',  calcada: false, obs: 'Raízes superficiais e copa muito larga: melhor em praças e canteiros largos.', origem: 'exotica' },
+  'castanhola':   { nome: 'Castanhola',         cientifico: 'Terminalia catappa',         agua: 'media', porte: 'grande',  calcada: false, origem: 'exotica', obs: 'Raízes superficiais que levantam o piso e copa muito larga: melhor em praças e áreas abertas.' },
+  'pau-ferro':    { nome: 'Pau-ferro',          cientifico: 'Libidibia ferrea',           agua: 'baixa', porte: 'grande',  calcada: true, origem: 'nativa', obs: 'Só em calçada larga, sem fiação.' },
+  'ficus':        { nome: 'Fícus',              cientifico: 'Ficus benjamina',            agua: 'alta',  porte: 'grande',  calcada: false, obs: 'Raízes agressivas: quebram calçada e tubulação. Candidata a substituição.', origem: 'exotica' },
   'desconhecida': { nome: 'Não identificada',   cientifico: '—',                          agua: 'media', porte: 'medio',   calcada: true, obs: 'Identificar a espécie em vistoria.' }
 };
 
@@ -98,6 +100,12 @@ Arbo.seed = function () {
   }));
   // vistorias técnicas de exemplo (js/risco.js)
   return Arbo.risco ? Arbo.risco.seedVistorias(arvores) : arvores;
+};
+
+// Largura da calçada (m) e fiação aérea de algumas árvores de exemplo (FICTÍCIO), para mostrar o recomendador
+Arbo.LOCAL_EXEMPLO = {
+  'arv-0001': [2.4, false], 'arv-0002': [1.8, true], 'arv-0003': [2.2, false], 'arv-0004': [1.8, true],
+  'arv-0007': [1.6, false], 'arv-0008': [3.0, false], 'arv-0009': [1.6, true], 'arv-0012': [2.0, true], 'arv-0013': [2.0, true]
 };
 
 // Empreendimentos com plantio compensatório (TCA). Nomes e números FICTÍCIOS, só para o protótipo.

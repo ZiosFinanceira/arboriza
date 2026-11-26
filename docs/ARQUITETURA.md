@@ -147,6 +147,12 @@ Funções da área restrita:
 
 **Importante:** no protótipo, as restrições são aplicadas só na tela. Na versão real, o servidor precisa validar cada ação (ex.: políticas RLS no Supabase por função e por equipe).
 
+## Novidades de 26/11/2026
+
+- **Espécie certa** (`js/especies.js`): limites de referência por largura do passeio (menos de 1,5 m: não plantar; 1,5 m: pequeno; 2,0 m: médio; 2,5 m: grande) e, com fiação aérea, só porte pequeno. Ajustar `PARAMS` ao manual do município. Catálogo com origem nativa/exótica.
+- **Laudo de poda ou supressão** (`js/laudo.js`): exige vistoria técnica; prazos de referência por classe de risco (crítico até 24 h, alto 7 dias, moderado 30, baixo 90); compensação sugerida pelo porte (1, 2 ou 3 mudas), sempre sujeita à lei municipal. Permissão `emitir_laudo` (administração, coordenação, fiscalização).
+- **Alerta de chuva forte** (`js/alerta.js`): permissão `gerir_alertas` (administração e coordenação). Entram na fila: risco alto ou crítico, árvore grande em local movimentado, espécie grande sem vistoria, chamado de risco aberto e árvore morta em pé. Críticos e mortas vão para a equipe de manejo; o resto para a vistoria. A OS pós-chuva só fecha com a vistoria técnica registrada.
+
 ## 5. Modelo de dados (inicial)
 
 ```

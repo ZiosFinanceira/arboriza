@@ -24,11 +24,12 @@
     rega: ['Conferir se a terra está seca antes de regar', 'Regar o volume indicado em cada parada', 'Registrar foto de pelo menos uma muda'],
     manejo: ['Sinalizar e isolar a área', 'Usar EPI completo (capacete, luvas, óculos)', 'Confirmar com a distribuidora se houver rede elétrica', 'Executar o serviço', 'Recolher os resíduos', 'Registrar foto de antes e depois'],
     cuidado: ['Avaliar o estado da muda', 'Tratar, replantar ou substituir', 'Conferir tutor e protetor', 'Regar após o serviço', 'Registrar foto'],
-    vistoria: ['Ir até o local indicado', 'Conferir largura da calçada, fiação e tubulação', 'Verificar se já existe árvore ou pedido igual', 'Registrar foto do local']
+    vistoria: ['Ir até o local indicado', 'Conferir largura da calçada, fiação e tubulação', 'Verificar se já existe árvore ou pedido igual', 'Registrar foto do local'],
+    chuva: ['Conferir a árvore e o entorno depois da chuva', 'Verificar inclinação nova, rachaduras, galhos pendurados e raízes soltas', 'Isolar a área se houver risco imediato', 'Registrar foto', 'Registrar a vistoria técnica no sistema']
   };
-  const MIN_SERVICO = { rega: 8, manejo: 60, cuidado: 30, vistoria: 15 }; // minutos por parada
+  const MIN_SERVICO = { rega: 8, manejo: 60, cuidado: 30, vistoria: 15, chuva: 15 }; // minutos por parada
   const STATUS = { pendente: 'Pendente', deslocamento: 'Em deslocamento', execucao: 'Em execução', concluida: 'Concluída' };
-  const grupo = (os) => (os.tipo === 'rega' ? 'rega' : os.tipo === 'vistoria' ? 'vistoria' : MANEJO.includes((chamado(os) || {}).tipo) ? 'manejo' : 'cuidado');
+  const grupo = (os) => (os.tipo === 'rega' ? 'rega' : os.tipo === 'vistoria' ? 'vistoria' : os.tipo === 'chuva' ? 'chuva' : MANEJO.includes((chamado(os) || {}).tipo) ? 'manejo' : 'cuidado');
 
   let lista = carregar();
   let seq = (lista || []).reduce((m, o) => Math.max(m, +o.id.slice(3)), 0);
@@ -47,15 +48,19 @@
   }
   function prioridade(os) {
     if (os.tipo === 'chamado') { const c = chamado(os); return c ? (c.risco === 'urgente' ? 1000 : 0) + CH.prioridade(c, new Date()) : 0; }
+    if (os.tipo === 'chuva') return (os.classe === 'critico' ? 1000 : 900) + (os.pontos || 0);
     return os.tipo === 'rega' ? 35 : 15;
   }
+  const arvoreDa = (os) => (os.tipo === 'chuva' ? A.arvores.find((x) => x.id === os.ref) : null);
   function local(os) {
     if (os.tipo === 'chamado') { const c = chamado(os); const l = c && A.localChamado(c); return l ? [l.lat, l.lng, l.texto] : null; }
     if (os.tipo === 'vistoria') { const s = A.sugestao && A.sugestao(os.ref); return s ? [s.lat, s.lng, s.endereco || 'Local sugerido'] : null; }
+    if (os.tipo === 'chuva') { const t = arvoreDa(os); return t ? [t.lat, t.lng, `${(Arbo.ESPECIES[t.especie] || {}).nome || 'Árvore'} · ${t.endereco || t.id}`] : null; }
     const a = A.arvores.find((x) => x.id === (os.paradas || [])[0]); return a ? [a.lat, a.lng, `${os.paradas.length} paradas`] : null;
   }
   function titulo(os) {
     if (os.tipo === 'chamado') { const c = chamado(os); return c ? CH.TIPOS[c.tipo] : 'Chamado'; }
+    if (os.tipo === 'chuva') return 'Vistoria pós-chuva';
     return os.tipo === 'rega' ? 'Rota de rega' : 'Vistoria de sugestão';
   }
 
@@ -212,6 +217,7 @@
     const minha = Arbo.pode('minhas_os') && Arbo.sessao().equipe === os.equipe;
     const podeMarcar = minha && os.status === 'execucao';
     const pendRega = os.tipo === 'rega' ? (os.paradas || []).filter((x) => !(os.regadas || []).includes(x)) : [];
+    if (os.tipo === 'chuva') { const t = arvoreDa(os), uv = t && Arbo.risco ? Arbo.risco.ultimaVistoria(t) : null; if (uv && uv.data >= os.criada.slice(0, 10)) os.check[os.check.length - 1] = true; }
     const checkOk = os.check.every(Boolean) && pendRega.length === 0 && (g !== 'vistoria' || ['aprovada', 'recusada'].includes((A.sugestao(os.ref) || {}).status));
     if (l) A.mapa.setView([l[0], l[1]], Math.max(A.mapa.getZoom(), 17));
     const d = $('#detalhe');
@@ -234,6 +240,10 @@
           return `<li class="${ok ? 'ok' : ''}"><span>${esc((Arbo.ESPECIES[a.especie] || {}).nome)} · ${esc(a.endereco || '')} <small>${irr.litros ? irr.litros + ' L' : ''}</small></span>
           ${ok ? '<b>Regada</b>' : `<button class="btn" data-regar="${pid}" ${podeMarcar ? '' : 'disabled'}>Regada</button>`}</li>`; }).join('')}</ul></div>` : ''}
       ${os.tipo === 'vistoria' && A.cartaoSugestao ? A.cartaoSugestao(os.ref, minha && os.status === 'execucao') : ''}
+      ${os.tipo === 'chuva' && arvoreDa(os) ? (() => { const t = arvoreDa(os), r = A.risco ? A.risco(t) : null; return `<div class="cartao"><h4>Árvore</h4>
+        <p style="margin:0 0 6px;font-size:14px">${esc((Arbo.ESPECIES[t.especie] || {}).nome || '')} · ${esc(t.endereco || t.id)} ${r && A.seloRisco ? A.seloRisco(r) : ''}</p>
+        <p class="ajuda">Entrou na fila do alerta de chuva por: ${esc(os.motivo || 'risco alto')}.</p>
+        <div class="acoes"><button class="btn" data-os-ficha="${esc(t.id)}">Ver ficha</button>${minha && os.status === 'execucao' && A.abrirVistoria ? `<button class="btn primario" data-os-vist="${esc(t.id)}">Registrar vistoria</button>` : ''}</div></div>`; })() : ''}
       <div class="cartao"><h4>Checklist obrigatório</h4>
         ${os.check.map((v, i) => `<label class="check-linha"><input type="checkbox" data-ck="${i}" ${v ? 'checked' : ''} ${podeMarcar ? '' : 'disabled'}> ${esc(CHECK[g][i])}</label>`).join('')}
         <label class="campo" style="margin-top:8px">Foto do serviço <input type="file" accept="image/*" capture="environment" id="os-foto" ${podeMarcar ? '' : 'disabled'}></label>
@@ -268,10 +278,18 @@
       salvar(); A.atualizar(); abrir(id);
     }));
     if (A.ligarCartaoSugestao) A.ligarCartaoSugestao(d, () => { sincronizar(); A.atualizar(); abrir(id); });
+    d.querySelectorAll('[data-os-ficha]').forEach((b) => (b.onclick = () => A.selecionar(b.dataset.osFicha, true)));
+    d.querySelectorAll('[data-os-vist]').forEach((b) => (b.onclick = () => { const t = A.arvores.find((x) => x.id === b.dataset.osVist); A.abrirVistoria(t); }));
   }
 
   // Novos chamados e sugestões geram OS automaticamente
   A.aoCriarChamado.push((c) => { const os = nova({ tipo: 'chamado', ref: c.id, equipe: equipePara(c.tipo) }); Arbo.auditar('OS criada', `${os.id} para ${equipe(os.equipe).nome}`); });
+  // Alerta de chuva: uma OS de vistoria pós-chuva por árvore, sem duplicar as que já estão abertas
+  A.criarOSChuva = (arv, dados) => {
+    if (lista.some((o) => o.tipo === 'chuva' && o.ref === arv.id && o.status !== 'concluida')) return null;
+    return nova({ tipo: 'chuva', ref: arv.id, ...dados });
+  };
+  A.listaOS = () => lista;
   A.criarVistoria = (s) => { const os = nova({ tipo: 'vistoria', ref: s.id, equipe: 'eq-03' }); return os; };
   A.EQUIPES = Arbo.EQUIPES;
   A.renderers.push(() => { if (A.abaAtiva() === 'os') render(); else desenharRota(); });

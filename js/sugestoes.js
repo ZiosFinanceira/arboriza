@@ -37,7 +37,8 @@
     if (aprovar) {
       if (s.tipo === 'arvore_nao_mapeada' || s.tipo === 'plantio') {
         const planejada = s.tipo === 'plantio';
-        A.arvores.push({ id: 'arv-' + Date.now().toString(36), lat: s.lat, lng: s.lng, especie: 'desconhecida', origem: planejada ? 'planejada' : 'nao-cadastrada',
+        A.arvores.push({ id: 'arv-' + Date.now().toString(36), lat: s.lat, lng: s.lng, especie: (planejada && s.local && s.local.especie) || 'desconhecida', origem: planejada ? 'planejada' : 'nao-cadastrada',
+          larguraCalcada: s.local ? s.local.larguraCalcada : null, fiacaoAerea: s.local ? s.local.fiacaoAerea : null,
           endereco: s.endereco || '', plantio: null, ultimaIrrigacao: null, ultimaAdubacao: null, sensor: false, saude: 'viva', historico: [],
           obs: `${planejada ? 'Local aprovado para plantio' : 'Árvore incluída'} a partir da sugestão ${s.id} de ${s.autor.nome}.` });
         A.salvar();
@@ -65,6 +66,13 @@
         ${s.foto ? `<dt>Foto</dt><dd>${esc(s.foto)}</dd>` : ''}
       </dl>
       ${s.status === 'analise' ? (podeDecidir ? `
+        ${s.tipo === 'plantio' ? `<div class="sug-especie">
+          <p class="ajuda" style="margin:6px 0">Antes de aprovar o plantio, meça o local:</p>
+          <div class="campos-2"><label class="campo">Largura da calçada (m)<input data-sg-larg inputmode="decimal" placeholder="Ex.: 2,2"></label>
+          <label class="campo">Fiação aérea?<select data-sg-fia><option value="">Não sei</option><option value="sim">Sim</option><option value="nao">Não</option></select></label></div>
+          <div data-sg-rec></div>
+          <label class="campo">Espécie a plantar<select data-sg-esp><option value="desconhecida">Definir depois</option></select></label>
+        </div>` : ''}
         <div class="acoes"><button class="btn primario" data-decidir="aprovar">Aprovar</button></div>
         <label class="campo" style="margin-top:8px">Ou recuse com um motivo
           <select data-motivo><option value="">Escolha o motivo</option>${MOTIVOS.map((m) => `<option>${esc(m)}</option>`).join('')}</select></label>
@@ -75,8 +83,27 @@
   A.ligarCartaoSugestao = (raiz, depois) => {
     raiz.querySelectorAll('.sug-cartao').forEach((c) => {
       const s = A.sugestao(c.dataset.sug);
+      const lg = c.querySelector('[data-sg-larg]');
+      if (lg) {
+        const up = () => {
+          const fi = c.querySelector('[data-sg-fia]').value, f = fi === 'sim' ? true : fi === 'nao' ? false : null;
+          c.querySelector('[data-sg-rec]').innerHTML = A.caixaEspecies(lg.value, f, 4);
+          const r = A.recomendarEspecies(lg.value, f), sel = c.querySelector('[data-sg-esp]'), atual = sel.value;
+          sel.innerHTML = '<option value="desconhecida">Definir depois</option>' + r.servem.map((x) => `<option value="${x.id}">${esc(x.nome)}${x.nativa ? ' (nativa)' : ''}</option>`).join('');
+          if ([...sel.options].some((o) => o.value === atual)) sel.value = atual;
+        };
+        lg.addEventListener('input', up); c.querySelector('[data-sg-fia]').addEventListener('change', up); up();
+      }
       c.querySelectorAll('[data-decidir]').forEach((b) => (b.onclick = () => {
-        if (b.dataset.decidir === 'aprovar') decidir(s, true);
+        if (b.dataset.decidir === 'aprovar') {
+          const lg = c.querySelector('[data-sg-larg]');
+          if (lg) {
+            const fi = c.querySelector('[data-sg-fia]').value, r = A.recomendarEspecies(lg.value, fi === 'sim' ? true : fi === 'nao' ? false : null);
+            if (r.ok === false) { A.toast('Calçada estreita demais para plantio: recuse com o motivo "Calçada estreita"'); return; }
+            s.local = { larguraCalcada: lg.value ? Number(lg.value.replace(',', '.')) : null, fiacaoAerea: fi === 'sim' ? true : fi === 'nao' ? false : null, especie: c.querySelector('[data-sg-esp]').value };
+          }
+          decidir(s, true);
+        }
         else { const m = c.querySelector('[data-motivo]').value; if (!m) { c.querySelector('[data-motivo]').focus(); A.toast('Escolha o motivo da recusa'); return; } decidir(s, false, m); }
         depois();
       }));

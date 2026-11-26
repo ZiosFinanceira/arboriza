@@ -171,6 +171,7 @@
       <!-- Controle urbano -->
       <section class="conteudo oculto" id="aba-controle">
         <header class="sec-head"><h2>Controle urbano</h2><p>Poda, corte, risco de queda e outros chamados. Urgentes primeiro, depois os que estão abertos há mais tempo.</p></header>
+        <div id="alerta-cartao"></div>
         <div class="kpis" id="kpis-ch"></div>
         <div class="filtros">
           <select id="filtro-risco" aria-label="Risco"><option value="">Todos os riscos</option></select>
@@ -238,6 +239,8 @@
         </div>
         <h3 class="secao">Suas sugestões</h3>
         <div id="agente-sugestoes" class="bloco"></div>
+        <h3 class="secao">Qual árvore cabe na minha calçada?</h3>
+        <div id="agente-especie" class="bloco"></div>
         <h3 class="secao">Mudas precisando de você</h3>
         <ul id="agente-tarefas" class="lista"></ul>
         <h3 class="secao">Hortas e mutirões</h3>
@@ -275,6 +278,7 @@
     <div class="mapa-wrap">
       <div id="mapa"></div>
       <div class="chip-perfil" id="chip-perfil"></div>
+      <div class="chip-alerta oculto" id="chip-alerta" role="status"></div>
       <div class="chip-clima" id="clima">Carregando clima…</div>
       <div id="aviso-mapear" class="aviso oculto">Clique no mapa onde está a árvore · <button id="btn-cancelar-mapear">Cancelar</button></div>
       <details class="legenda"><summary>Legenda</summary><div id="legenda"></div></details>
@@ -285,7 +289,13 @@
   <dialog id="dlg-arvore">
     <form id="form-arvore" method="dialog">
       <h3>Nova árvore</h3>
+      <div class="campos-2">
+        <label>Largura da calçada (m) <input name="largura" inputmode="decimal" placeholder="Ex.: 2,2"></label>
+        <label>Fiação aérea em cima? <select name="fiacao"><option value="">Não sei</option><option value="sim">Sim</option><option value="nao">Não</option></select></label>
+      </div>
+      <div id="rec-especies" class="rec-especies"></div>
       <label>Espécie <select name="especie" id="sel-especie"></select></label>
+      <p id="aviso-especie" class="aviso-sug"></p>
       <label>Origem <select name="origem" id="sel-origem"></select></label>
       <label>Endereço ou referência <input name="endereco" placeholder="Ex.: R. Padre Carapuceiro, 800"></label>
       <label>Data de plantio (aproximada) <input type="date" name="plantio" required></label>
@@ -408,6 +418,46 @@
       <div class="acoes"><button value="nao" class="btn">Cancelar</button><button value="sim" class="btn primario" id="btn-confirmar-sim">Confirmar</button></div>
     </form>
   </dialog>
+  <dialog id="dlg-alerta">
+    <form id="form-alerta" method="dialog">
+      <h3>Ativar alerta de chuva forte</h3>
+      <p class="ajuda" id="alerta-previa"></p>
+      <label>Nível <select name="nivel" id="sel-alerta-nivel"></select></label>
+      <label>Referência do aviso (opcional) <input name="ref" placeholder="Ex.: aviso da Defesa Civil de hoje, 14h"></label>
+      <p class="ajuda">Todos os perfis passam a ver o aviso no mapa. Moradores recebem a orientação de não ficar embaixo de árvores.</p>
+      <div class="acoes">
+        <button type="button" id="btn-cancelar-alerta" class="btn">Cancelar</button>
+        <button value="ok" class="btn primario">Ativar alerta</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-laudo">
+    <form id="form-laudo" method="dialog">
+      <h3>Laudo de poda ou supressão</h3>
+      <p class="ajuda" id="laudo-resumo"></p>
+      <div id="laudo-sem-vistoria" class="oculto">
+        <p class="alerta-esp">Esta árvore ainda não tem vistoria técnica. O laudo precisa dos dados da vistoria (DAP, altura, defeitos e ocupação embaixo).</p>
+        <button type="button" class="btn primario" id="btn-laudo-vistoria" data-perm="registrar_vistoria" style="margin-top:10px">Registrar vistoria agora</button>
+      </div>
+      <div id="laudo-campos">
+        <label>Intervenção recomendada <select name="tipo"></select></label>
+        <label>Justificativa <textarea name="justificativa" rows="4"></textarea></label>
+        <label>Prazo <input name="prazo"></label>
+        <div id="laudo-comp" class="oculto"><label>Mudas de compensação (sugestão; confira a lei municipal) <input name="mudas" type="number" min="0" step="1"></label></div>
+        <div class="campos-2">
+          <label>Responsável técnico <input name="rt" placeholder="Nome (pode completar depois)"></label>
+          <label>Registro e ART/TRT <input name="registro" placeholder="CREA/CRBio nº, ART nº"></label>
+        </div>
+        <label class="check"><input type="checkbox" name="chamado"> Abrir chamado com esta recomendação</label>
+        <p class="ajuda" id="laudo-por"></p>
+      </div>
+      <div class="acoes">
+        <button type="button" id="btn-cancelar-laudo" class="btn">Cancelar</button>
+        <button value="ok" class="btn primario" id="btn-laudo-gerar">Gerar laudo</button>
+      </div>
+    </form>
+  </dialog>
   <div id="toast" class="toast" role="status"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -422,6 +472,7 @@
   <script src="js/vendor/qrcode.js"></script>
   <script src="js/placa.js"></script>
   <script src="js/vistoria.js"></script>
+  <script src="js/especies.js"></script>
   <script src="js/obras.js"></script>
   <script src="js/agente.js"></script>
   <script src="js/sugestoes.js"></script>
@@ -430,6 +481,8 @@
   <script src="js/acessos.js"></script>
   <script src="js/painel.js"></script>
   <script src="js/relatorio.js"></script>
+  <script src="js/laudo.js"></script>
+  <script src="js/alerta.js"></script>
   <script src="js/csv.js"></script>
   <script src="js/acesso.js"></script>
 </body>
